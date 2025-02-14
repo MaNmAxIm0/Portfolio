@@ -643,7 +643,31 @@ header {
 
   /* Aumenta margem direita nos controles */
   .item-controls {
+    padding-right: 25px;
+    margin-left: 15px;
+  }
+
+  /* Alinhamento da fonte com o título */
+  .fonte-container {
+    margin-left: 15px;
+    padding-left: 0;
+  }
+
+  /* Aumenta espaço direito nos botões */
+  li.item .item-controls {
+    margin-right: 25px;
     padding-right: 15px;
+  }
+
+  /* Remove margem esquerda da fonte */
+  .item-source {
+    margin-left: 0 !important;
+    padding-left: 8px;
+  }
+  
+  /* Mantém alinhamento do título */
+  li.item .item-title {
+    margin-left: 15px;
   }
 
   /* Drag handle mais claro */
