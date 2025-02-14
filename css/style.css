@@ -1,778 +1,713 @@
-import {
-  initializeFirebase,
-  getTabs,
-  addTab,
-  updateTab,
-  deleteTab,
-  getItems,
-  addItem,
-  updateItem,
-  deleteItem,
-  updateTabOrder,
-  getTopics,
-  addTopic,
-  updateTopic,
-  deleteTopic,
-  updateTopicOrder,
-  updateItemOrder
-} from './firebase.js';
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  margin: 0;
+  background-color: #ffffff;
+  color: #333333;
+}
 
-document.addEventListener('DOMContentLoaded', async () => {
-  // Initialize Firebase
-  await initializeFirebase();
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 30px auto;
+  background-color: #fff;
+}
 
-  const tabList = document.getElementById('tab-list');
-  const tabContent = document.getElementById('tab-content');
+header {
+  text-align: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+  color: #333333;
+}
 
-  let tabs = [];
-  let currentTabId = null;
-  let sortable;
-  let topicSortable;
-  const isMobile = window.innerWidth <= 768;
+/* Tab Navigation */
+#tab-navigation {
+  margin-bottom: 30px;
+}
 
-  // Helper: Extract domain from a URL and remove "www." if present.
-  function extractDomain(url) {
-    try {
-      return new URL(url).hostname.replace(/^www\./, '');
-    } catch (error) {
-      return url.replace(/^www\./, '');
-    }
+#tab-navigation ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+}
+
+#tab-navigation ul li {
+  margin: 0;
+}
+
+/* Tab styling */
+.tab-container {
+  display: inline-flex;
+  align-items: center;
+  padding: 16px 32px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  cursor: move;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.tab-container.active {
+  background-color: #2196F3;
+  color: white;
+  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  color: inherit;
+}
+
+.tab-button:focus {
+  outline: none;
+}
+
+.tab-delete-button {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 12px;
+  padding: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.tab-delete-button:hover {
+  opacity: 1;
+}
+
+/* Plus Button Styling */
+#add-tab-button {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
+}
+
+#add-tab-button:hover {
+  background-color: #1976D2;
+}
+
+/* Topic styles */
+#topics-container {
+  margin-top: 30px;
+}
+
+.topic {
+  margin-bottom: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.topic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: #333333;
+}
+
+.topic-header:hover {
+  background-color: #f1f3f4;
+}
+
+/* Topic Title Container (for mobile and desktop) */
+.topic-title-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topic-name {
+  font-weight: 500;
+  font-size: 16px;
+  color: #333333;
+  cursor: default;
+}
+
+.topic-name-input {
+  font-size: 16px;
+  padding: 5px 10px;
+  border: 2px solid #2196F3;
+  border-radius: 4px;
+  background-color: white;
+}
+
+/* Topic Controls */
+.topic-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Topic Drag Handle */
+.topic-drag-handle {
+  cursor: grab;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  padding: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.topic-drag-handle:hover {
+  background-color: #d5d5d5;
+}
+
+.topic-delete-button {
+  background: none;
+  border: none;
+  color: #000000;
+  cursor: pointer;
+  padding: 5px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  font-weight: bold;
+}
+
+.topic-delete-button:hover {
+  opacity: 1;
+}
+
+.topic.collapsed .topic-content {
+  display: none;
+}
+
+/* Item List */
+.item-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item-list li {
+  position: relative;
+  padding: 12px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333333;
+  min-height: 24px;
+}
+
+.item-list li:last-child {
+  border-bottom: none;
+}
+
+/* Desktop Item Styles */
+.item-left .item-title {
+  margin-right: 20px;
+  font-weight: 500;
+  word-break: break-word; 
+}
+
+.item-link-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-link {
+  flex-grow: 1;
+  min-width: 100px; 
+  color: #1976D2;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  word-break: break-all;
+}
+
+.item-link:hover {
+  color: #0D47A1;
+}
+
+/* Fonte link: same as item-link but italic and gray */
+.fonte-container .item-source,
+.item-source {
+  flex-grow: 1;
+  min-width: 100px; 
+  text-decoration: none;
+  transition: color 0.2s ease;
+  word-break: break-all;
+  font-style: italic;
+  color: #555;
+}
+
+.item-source:hover {
+  color: #555;
+}
+
+.item-description {
+  cursor: pointer;
+  color: #424242;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tooltip {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 300px;
+  padding: 25px 15px 15px;
+}
+
+.tooltip-close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 5px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.tooltip-close:hover {
+  opacity: 1;
+}
+
+.tooltip-close svg {
+  display: block;
+}
+
+.item-description:hover .tooltip {
+  display: block;
+}
+
+/* Item Options */
+.item-options {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.item-right-controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.drag-handle {
+  cursor: grab;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  padding: 4px;
+  transition: background-color 0.3s ease;
+  margin-right: 8px;
+}
+
+.drag-handle:hover {
+  background-color: #d5d5d5;
+}
+
+.edit-button {
+  background-color: #f8f9fa;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 14px;
+  color: #333;
+}
+
+.edit-button:hover {
+  background-color: #e0e0e0;
+}
+
+.delete-button {
+  background-color: #ff4d4f;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 14px;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #ff7875;
+}
+
+/* Item Form */
+.item-form {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  position: relative;
+}
+
+.item-form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-form .form-group:last-of-type {
+  flex-grow: 1;
+  width: auto;
+  margin-right: 50px;
+}
+
+.item-form label {
+  margin-bottom: 8px;
+  color: #424242;
+  font-size: 14px;
+}
+
+.item-form input[type="text"] {
+  width: 20ch;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  transition: border-color 0.2s ease;
+}
+
+.item-form input[type="text"]:focus {
+  border-color: #2196F3;
+  outline: none;
+}
+
+.item-form textarea {
+  width: calc(100% - 50px);
+  height: 38px;
+  resize: vertical;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  transition: border-color 0.2s ease;
+  height: 36px;
+}
+
+.item-form textarea:focus {
+  border-color: #2196F3;
+  outline: none;
+}
+
+#save-item-button, .item-form button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  margin-top: 27px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: background-color 0.2s ease;
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+}
+
+#save-item-button:hover, .item-form button:hover {
+  background-color: #388E3C;
+}
+
+#add-topic-button {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border: 2px dashed #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 20px;
+  font-size: 16px;
+  color: #757575;
+  transition: all 0.2s ease;
+}
+
+#add-topic-button:hover {
+  background-color: #f1f3f4;
+  border-color: #2196F3;
+  color: #2196F3;
+}
+
+.sortable-ghost {
+  opacity: 0.4;
+}
+
+.topic .item-form {
+  margin: 10px 0 0 0;
+  border-radius: 4px;
+}
+
+/* Loading Indicator */
+.loading {
+  font-size: 1.5em;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Mobile adjustments */
+@media only screen and (max-width: 768px) {
+  /* Adjustments for existing desktop elements */
+  .item-list li {
+    flex-direction: column;
+    align-items: center;
+  }
+  .item-left {
+    text-align: center;
+  }
+  .item-right-controls {
+    margin-left: 0;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .topic-drag-handle {
+    margin: 0 auto 8px auto;
+    display: block;
   }
 
-  // Delete Topic
-  async function deleteCurrentTopic(topicId) {
-    const confirmDelete = confirm('Tem certeza que deseja excluir este tópico?');
-    if (confirmDelete) {
-      await deleteTopic(topicId);
-      const topicElement = document.querySelector(`.topic[data-topic-id="${topicId}"]`);
-      if (topicElement) topicElement.remove();
-    }
+  /* New Mobile Item Layout */
+  li.item {
+    list-style: none;
+    padding: 12px 16px;
+    gap: 8px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  li.item .item-title {
+    margin: 0;
+    white-space: nowrap;
+  }
+  li.item .item-middle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 0 8px;
+  }
+  li.item .link-explanation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  li.item .link-explanation .item-link {
+    text-decoration: none;
+    color: #1976D2;
+  }
+  li.item .item-description {
+    cursor: pointer;
+    position: relative;
+    color: #424242;
+    margin-left: 8px;
+  }
+  li.item .item-controls {
+    display: flex;
+    gap: 12px;
+    padding-left: 8px;
+  }
+  li.item .item-footer {
+    font-style: italic;
+    color: #555;
+    text-align: center;
+  }
+  li.item .item-footer .item-source {
+    text-decoration: none;
+    color: inherit;
+  }
+  li.item .item-link {
+    color: #1976D2;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60%;
   }
 
-  // Delete Item
-  async function deleteCurrentItem(itemId) {
-    const confirmDelete = confirm('Tem certeza que deseja excluir este item?');
-    if (confirmDelete) {
-      await deleteItem(currentTabId, itemId);
-      const itemElement = document.querySelector(`li[data-item-id="${itemId}"]`);
-      if (itemElement) itemElement.remove();
-    }
+  /* Ajuste de alinhamento para título e link */
+  li.item .item-title {
+    margin-left: 15px;
+    text-align: left;
+    width: auto;
+    margin-right: 8px;
   }
 
-  // Create Item Element (mobile and desktop layouts)
-  function createItemElement(item) {
-    if (window.innerWidth <= 768) {
-      // Novo layout móvel atualizado
-      const li = document.createElement('li');
-      li.dataset.itemId = item.id;
-      li.classList.add('item');
-      li.style.padding = '12px 15px';
-      li.style.gap = '8px';
-
-      // Linha 1: Título + Link + Explicação
-      const titleLinkContainer = document.createElement('div');
-      titleLinkContainer.style.display = 'flex';
-      titleLinkContainer.style.gap = '8px';
-      titleLinkContainer.style.alignItems = 'center';
-      titleLinkContainer.style.marginBottom = '8px';
-      titleLinkContainer.style.width = '100%';
-
-      const titleSpan = document.createElement('span');
-      titleSpan.classList.add('item-title');
-      titleSpan.textContent = item.title;
-      titleLinkContainer.appendChild(titleSpan);
-
-      const mainLink = document.createElement('a');
-      mainLink.classList.add('item-link');
-      mainLink.href = item.link;
-      mainLink.target = '_blank';
-      mainLink.textContent = extractDomain(item.link);
-      titleLinkContainer.appendChild(mainLink);
-
-      // Botão de explicação na mesma linha do link
-      const questionSpan = document.createElement('span');
-      questionSpan.classList.add('item-description');
-      questionSpan.textContent = '?';
-      const tooltip = document.createElement('div');
-      tooltip.classList.add('tooltip');
-      
-      // Botão de fechar
-      const closeButton = document.createElement('div');
-      closeButton.classList.add('tooltip-close');
-      closeButton.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M13 1L1 13M1 1l12 12" stroke="#666" stroke-width="2" stroke-linecap="round"/>
-      </svg>`;
-      
-      closeButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        tooltip.classList.remove('active');
-        questionSpan.classList.remove('active');
-      });
-
-      tooltip.appendChild(closeButton);
-      const tooltipText = document.createElement('div');
-      tooltipText.textContent = item.description || 'Sem descrição';
-      tooltip.appendChild(tooltipText);
-      
-      // Atualizar evento de clique
-      questionSpan.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const wasActive = tooltip.classList.contains('active');
-        tooltip.classList.toggle('active', !wasActive);
-        questionSpan.classList.toggle('active', !wasActive);
-      });
-      
-      // Fechar tooltip ao clicar fora
-      document.addEventListener('click', (e) => {
-        if (!questionSpan.contains(e.target)) {
-          tooltip.classList.remove('active');
-          questionSpan.classList.remove('active');
-        }
-      });
-
-      titleLinkContainer.appendChild(questionSpan);
-      questionSpan.appendChild(tooltip);
-
-      li.appendChild(titleLinkContainer);
-
-      // Linha 2: Fonte + Controles
-      const middleDiv = document.createElement('div');
-      middleDiv.style.display = 'flex';
-      middleDiv.style.justifyContent = 'space-between';
-      middleDiv.style.alignItems = 'center';
-      middleDiv.style.width = '100%';
-      middleDiv.style.marginLeft = '15px';
-
-      // Container fonte
-      const fonteContainer = document.createElement('div');
-      fonteContainer.style.display = 'flex';
-      fonteContainer.style.alignItems = 'center';
-      fonteContainer.style.gap = '8px';
-
-      const fonteLink = document.createElement('a');
-      fonteLink.classList.add('item-source');
-      fonteLink.target = '_blank';
-      if (item.fonte) {
-        fonteLink.href = item.fonte;
-        fonteLink.textContent = extractDomain(item.fonte);
-      }
-      fonteContainer.appendChild(fonteLink);
-
-      middleDiv.appendChild(fonteContainer);
-
-      // Controles
-      const controlsDiv = document.createElement('div');
-      controlsDiv.style.display = 'flex';
-      controlsDiv.style.gap = '8px';
-
-      const dragHandle = document.createElement('span');
-      dragHandle.classList.add('drag-handle');
-      dragHandle.innerHTML = `<svg width="24" height="24" viewBox="0 0 8 24" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="1" cy="6" r="3" opacity="0.3"/>
-        <circle cx="7" cy="6" r="3" opacity="0.3"/>
-        <circle cx="1" cy="12" r="3" opacity="0.3"/>
-        <circle cx="7" cy="12" r="3" opacity="0.3"/>
-        <circle cx="1" cy="18" r="3" opacity="0.3"/>
-        <circle cx="7" cy="18" r="3" opacity="0.3"/>
-      </svg>`;
-      controlsDiv.appendChild(dragHandle);
-
-      const editButton = document.createElement('button');
-      editButton.classList.add('edit-button');
-      editButton.textContent = 'Editar';
-      editButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        toggleEditForm(item, li);
-      });
-      controlsDiv.appendChild(editButton);
-
-      const deleteButton = document.createElement('button');
-      deleteButton.classList.add('delete-button');
-      deleteButton.textContent = 'X';
-      deleteButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        deleteCurrentItem(item.id);
-      });
-      controlsDiv.appendChild(deleteButton);
-
-      middleDiv.appendChild(controlsDiv);
-      li.appendChild(middleDiv);
-
-      return li;
-    } else {
-      // Desktop layout: nos desktops o título fica à esquerda e, imediatamente à direita, um container com:
-      // o link, o botão de explicação e, à direita deste, a fonte.
-      const listItem = document.createElement('li');
-      listItem.dataset.itemId = item.id;
-
-      const leftContent = document.createElement('div');
-      leftContent.classList.add('item-left');
-      leftContent.style.display = 'flex';
-      leftContent.style.alignItems = 'center';
-      leftContent.style.gap = '10px';
-
-      const titleElement = document.createElement('span');
-      titleElement.classList.add('item-title');
-      titleElement.textContent = item.title;
-      leftContent.appendChild(titleElement);
-
-      const detailsContainer = document.createElement('div');
-      detailsContainer.classList.add('item-details');
-      detailsContainer.style.display = 'flex';
-      detailsContainer.style.alignItems = 'center';
-      detailsContainer.style.gap = '8px';
-
-      const mainLink = document.createElement('a');
-      mainLink.classList.add('item-link');
-      mainLink.target = '_blank';
-      mainLink.href = item.link;
-      mainLink.textContent = extractDomain(item.link);
-      detailsContainer.appendChild(mainLink);
-
-      const explanationButton = document.createElement('span');
-      explanationButton.classList.add('item-description');
-      explanationButton.textContent = '?';
-      const tooltip = document.createElement('div');
-      tooltip.classList.add('tooltip');
-      tooltip.innerHTML = `
-        <div class="tooltip-close">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M13 1L1 13M1 1l12 12" stroke="#666" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div>${item.description || 'Sem descrição'}</div>
-      `;
-      explanationButton.appendChild(tooltip);
-      tooltip.querySelector('.tooltip-close').addEventListener('click', (e) => {
-        e.stopPropagation();
-        tooltip.classList.remove('active');
-        explanationButton.classList.remove('active');
-      });
-      explanationButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const wasActive = tooltip.classList.contains('active');
-        tooltip.classList.toggle('active', !wasActive);
-        explanationButton.classList.toggle('active', !wasActive);
-      });
-      detailsContainer.appendChild(explanationButton);
-
-      const fonteLink = document.createElement('a');
-      fonteLink.classList.add('item-source');
-      fonteLink.target = '_blank';
-      if (item.fonte) {
-        fonteLink.href = item.fonte;
-        fonteLink.textContent = extractDomain(item.fonte);
-      } else {
-        fonteLink.textContent = '';
-      }
-      detailsContainer.appendChild(fonteLink);
-
-      leftContent.appendChild(detailsContainer);
-
-      const rightControls = document.createElement('div');
-      rightControls.classList.add('item-right-controls');
-
-      const dragHandle = document.createElement('span');
-      dragHandle.classList.add('drag-handle');
-      dragHandle.innerHTML = `<svg width="24" height="24" viewBox="0 0 8 24" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="1" cy="6" r="3" opacity="0.3"/>
-        <circle cx="7" cy="6" r="3" opacity="0.3"/>
-        <circle cx="1" cy="12" r="3" opacity="0.3"/>
-        <circle cx="7" cy="12" r="3" opacity="0.3"/>
-        <circle cx="1" cy="18" r="3" opacity="0.3"/>
-        <circle cx="7" cy="18" r="3" opacity="0.3"/>
-      </svg>`;
-      rightControls.appendChild(dragHandle);
-
-      const itemOptions = document.createElement('div');
-      itemOptions.classList.add('item-options');
-
-      const editButton = document.createElement('button');
-      editButton.classList.add('edit-button');
-      editButton.textContent = 'Editar';
-      editButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        toggleEditForm(item, listItem);
-      });
-      itemOptions.appendChild(editButton);
-
-      const deleteButton = document.createElement('button');
-      deleteButton.textContent = 'X';
-      deleteButton.classList.add('delete-button');
-      deleteButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        deleteCurrentItem(item.id);
-      });
-      itemOptions.appendChild(deleteButton);
-      rightControls.appendChild(itemOptions);
-
-      listItem.appendChild(leftContent);
-      listItem.appendChild(rightControls);
-
-      return listItem;
-    }
+  li.item .item-link {
+    margin-left: 0;
+    max-width: calc(100% - 100px);
   }
 
-  // Create Topic Element with adjusted drag button placement
-  function createTopicElement(topic) {
-    const topicElement = document.createElement('div');
-    topicElement.classList.add('topic');
-    topicElement.dataset.topicId = topic.id;
-
-    const topicHeader = document.createElement('div');
-    topicHeader.classList.add('topic-header');
-
-    const topicName = document.createElement('div');
-    topicName.classList.add('topic-name');
-    topicName.textContent = topic.name;
-    topicName.ondblclick = (e) => {
-      e.stopPropagation();
-      enableTopicNameEditing(topic, topicName);
-    };
-
-    const topicTitleContainer = document.createElement('div');
-    topicTitleContainer.classList.add('topic-title-container');
-    topicTitleContainer.appendChild(topicName);
-
-    const topicDragHandle = document.createElement('span');
-    topicDragHandle.classList.add('topic-drag-handle');
-    topicDragHandle.innerHTML = `<svg width="24" height="24" viewBox="0 0 8 24" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="1" cy="6" r="3" opacity="0.3"/>
-      <circle cx="7" cy="6" r="3" opacity="0.3"/>
-      <circle cx="1" cy="12" r="3" opacity="0.3"/>
-      <circle cx="7" cy="12" r="3" opacity="0.3"/>
-      <circle cx="1" cy="18" r="3" opacity="0.3"/>
-      <circle cx="7" cy="18" r="3" opacity="0.3"/>
-    </svg>`;
-    topicDragHandle.addEventListener('click', (e) => { e.stopPropagation(); });
-    topicTitleContainer.appendChild(topicDragHandle);
-
-    const deleteButton = document.createElement('button');
-    deleteButton.classList.add('topic-delete-button');
-    deleteButton.textContent = 'X';
-    deleteButton.onclick = (e) => {
-      e.stopPropagation();
-      deleteCurrentTopic(topic.id);
-    };
-
-    topicHeader.appendChild(topicTitleContainer);
-    topicHeader.appendChild(deleteButton);
-
-    topicHeader.onclick = () => {
-      const content = topicElement.querySelector('.topic-content');
-      if (content.style.display === 'none') {
-        content.style.display = 'block';
-        topicElement.classList.remove('collapsed');
-      } else {
-        content.style.display = 'none';
-        topicElement.classList.add('collapsed');
-      }
-    };
-
-    topicElement.appendChild(topicHeader);
-
-    const topicContent = document.createElement('div');
-    topicContent.classList.add('topic-content');
-    topicContent.style.display = 'none';
-    topicElement.classList.add('collapsed');
-
-    const itemList = document.createElement('ul');
-    itemList.classList.add('item-list');
-    itemList.dataset.topicId = topic.id;
-
-    getItems(currentTabId, topic.id).then(items => {
-      items.forEach(item => {
-        const listItem = createItemElement(item);
-        itemList.appendChild(listItem);
-      });
-      Sortable.create(itemList, {
-        group: 'items',
-        animation: 150,
-        handle: '.drag-handle',
-        onEnd: async function(evt) {
-          await updateAllItemOrders();
-        }
-      });
-    });
-
-    topicContent.appendChild(itemList);
-    topicContent.appendChild(renderItemForm(topic.id));
-    topicElement.appendChild(topicContent);
-
-    return topicElement;
+  /* Ajuste no container principal */
+  li.item {
+    padding: 12px 5px 12px 15px;
+    align-items: flex-start;
   }
 
-  // Update only the affected item in the DOM after editing
-  function toggleEditForm(item, listItem) {
-    const existingForm = listItem.querySelector('.item-form');
-    if (existingForm) {
-      existingForm.remove();
-      return;
-    }
-
-    const editForm = document.createElement('div');
-    editForm.classList.add('item-form');
-    editForm.innerHTML = `
-      <div class="form-group">
-        <label for="edit-item-title">Título:</label>
-        <input type="text" id="edit-item-title" name="edit-item-title" value="${item.title}">
-      </div>
-      <div class="form-group">
-        <label for="edit-item-link">Link:</label>
-        <input type="text" id="edit-item-link" name="edit-item-link" value="${item.link}">
-      </div>
-      <div class="form-group">
-        <label for="edit-item-fonte">Fonte:</label>
-        <input type="text" id="edit-item-fonte" name="edit-item-fonte" value="${item.fonte || ''}">
-      </div>
-      <div class="form-group">
-        <label for="edit-item-description">Explicação:</label>
-        <textarea id="edit-item-description" name="edit-item-description">${item.description || ''}</textarea>
-      </div>
-      <button id="save-edit-button">✓</button>
-    `;
-    editForm.querySelector('#save-edit-button').addEventListener('click', async () => {
-      const newTitle = editForm.querySelector('#edit-item-title').value;
-      const newLink = editForm.querySelector('#edit-item-link').value;
-      const newFonte = editForm.querySelector('#edit-item-fonte').value;
-      const newDescription = editForm.querySelector('#edit-item-description').value;
-      if (newTitle && newLink) {
-        await updateItem(currentTabId, item.id, item.topicId, newTitle, newLink, newFonte, newDescription);
-        listItem.querySelector('.item-title').textContent = newTitle;
-        const mainLink = listItem.querySelector('a.item-link');
-        mainLink.href = newLink;
-        mainLink.textContent = extractDomain(newLink);
-        listItem.querySelector('.tooltip').textContent = newDescription || 'Sem descrição';
-        const fonteLink = listItem.querySelector('a.item-source');
-        fonteLink.href = newFonte;
-        fonteLink.textContent = newFonte ? extractDomain(newFonte) : '';
-        editForm.remove();
-      } else {
-        alert('Por favor, preencha o título e o link.');
-      }
-    });
-    listItem.appendChild(editForm);
+  /* Melhoria no espaçamento entre elementos */
+  .item-middle {
+    padding: 0 15px;
+    width: 100%;
   }
 
-  function enableTabNameEditing(tab, tabButton) {
-    const container = tabButton.parentElement;
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = tab.name;
-    input.style.backgroundColor = 'lightblue';
-    input.style.border = '1px solid red';
-    input.style.fontSize = '1em';
-    input.style.width = `${input.value.length + 1}ch`;
-
-    input.addEventListener('input', () => {
-      input.style.width = `${input.value.length + 1}ch`;
-    });
-
-    const saveName = async () => {
-      const newName = input.value.trim();
-      if (newName && newName !== tab.name) {
-        await updateTab(tab.id, newName);
-        tab.name = newName;
-      }
-      const newButton = document.createElement('button');
-      newButton.classList.add('tab-button');
-      newButton.textContent = newName;
-      newButton.addEventListener('click', async () => {
-        if (tab.id === currentTabId) {
-          enableTabNameEditing(tab, newButton);
-        } else {
-          showTab(tab.id);
-        }
-      });
-      container.replaceChild(newButton, input);
-    };
-
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        saveName();
-      }
-    });
-    input.addEventListener('blur', saveName);
-
-    container.replaceChild(input, tabButton);
-    input.focus();
+  /* Alinhamento dos controles */
+  .item-controls {
+    width: 100%;
+    justify-content: flex-end;
+    padding-right: 15px;
+    margin-top: 8px;
   }
 
-  async function deleteCurrentTab(tabId) {
-    const confirmDelete = confirm('Tem certeza que deseja excluir esta aba?');
-    if (confirmDelete) {
-      await deleteTab(tabId);
-      const li = tabList.querySelector(`[data-tab-id="${tabId}"]`);
-      if (li) li.remove();
-      tabs = tabs.filter(t => t.id !== tabId);
-      if (currentTabId === tabId) {
-        if (tabs.length > 0) {
-          currentTabId = tabs[0].id;
-          showTab(currentTabId);
-        } else {
-          tabContent.innerHTML = '<p>Nenhuma aba encontrada. Clique no botão "+" para criar uma nova aba.</p>';
-          currentTabId = null;
-        }
-      }
-    }
+  /* Ajuste dos controles móveis */
+  .item-controls {
+    order: 2;
+    justify-content: flex-start !important;
+    width: 100%;
+    padding-left: 15px;
+    gap: 12px;
+    margin: 8px 0;
   }
 
-  async function addNewTab() {
-    const defaultName = "Nova aba";
-    const newOrder = tabs.length;
-    const newTabId = await addTab(defaultName, newOrder);
-    const newTab = { id: newTabId, name: defaultName, order: newOrder };
-    tabs.push(newTab);
-    currentTabId = newTabId;
-    const addTabLi = tabList.querySelector('li.no-drag');
-    const listItem = document.createElement('li');
-    listItem.dataset.tabId = newTabId;
-    const tabContainer = document.createElement('div');
-    tabContainer.classList.add('tab-container', 'active');
-    const tabButton = document.createElement('button');
-    tabButton.classList.add('tab-button');
-    tabButton.textContent = defaultName;
-    tabButton.addEventListener('click', async () => {
-      if (newTabId === currentTabId) {
-        enableTabNameEditing(newTab, tabButton);
-      } else {
-        showTab(newTabId);
-      }
-    });
-    tabContainer.appendChild(tabButton);
-    const deleteButton = document.createElement('button');
-    deleteButton.classList.add('tab-delete-button');
-    deleteButton.textContent = 'X';
-    deleteButton.addEventListener('click', (event) => {
-      event.stopPropagation();
-      deleteCurrentTab(newTabId);
-    });
-    tabContainer.appendChild(deleteButton);
-    listItem.appendChild(tabContainer);
-    tabList.insertBefore(listItem, addTabLi);
-    showTab(newTabId);
-    setTimeout(() => {
-      enableTabNameEditing(newTab, tabButton);
-    }, 300);
+  .item-controls .drag-handle {
+    margin-right: 0;
   }
 
-  async function showTab(tabId) {
-    currentTabId = tabId;
-    tabList.querySelectorAll('li[data-tab-id]').forEach(li => {
-      const container = li.querySelector('.tab-container');
-      if (li.dataset.tabId === tabId) {
-        container.classList.add('active');
-      } else {
-        container.classList.remove('active');
-      }
-    });
-    tabContent.innerHTML = '<div class="loading">Carregando conteúdo...</div>';
-    const topicsContainer = await renderTopics(tabId);
-    tabContent.innerHTML = '';
-    tabContent.appendChild(topicsContainer);
+  .item-middle {
+    order: 3;
+    width: 100%;
+    padding-left: 15px;
+  }
+  li.item .item-middle {
+    padding: 0 15px;
+    width: calc(100% - 30px);
+    margin: 8px 0;
+  }
+  
+  .item-source {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-left: 8px;
   }
 
-  async function loadTabs() {
-    tabs = await getTabs();
-    tabList.innerHTML = '';
-    tabs.forEach(tab => {
-      const listItem = document.createElement('li');
-      listItem.dataset.tabId = tab.id;
-      const tabContainer = document.createElement('div');
-      tabContainer.classList.add('tab-container');
-      if (tab.id === currentTabId) tabContainer.classList.add('active');
-      const tabButton = document.createElement('button');
-      tabButton.classList.add('tab-button');
-      tabButton.textContent = tab.name;
-      tabButton.addEventListener('click', async () => {
-        if (tab.id === currentTabId) {
-          enableTabNameEditing(tab, tabButton);
-        } else {
-          showTab(tab.id);
-        }
-      });
-      tabContainer.appendChild(tabButton);
-      const deleteButton = document.createElement('button');
-      deleteButton.classList.add('tab-delete-button');
-      deleteButton.textContent = 'X';
-      deleteButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        deleteCurrentTab(tab.id);
-      });
-      tabContainer.appendChild(deleteButton);
-
-      listItem.appendChild(tabContainer);
-      tabList.appendChild(listItem);
-    });
-    const addTabLi = document.createElement('li');
-    addTabLi.classList.add('no-drag');
-    const addTabButton = document.createElement('button');
-    addTabButton.textContent = '+';
-    addTabButton.id = 'add-tab-button';
-    addTabButton.addEventListener('click', async () => {
-      await addNewTab();
-    });
-    addTabLi.appendChild(addTabButton);
-    tabList.appendChild(addTabLi);
-
-    if (tabs.length > 0) {
-      if (!currentTabId) currentTabId = tabs[0].id;
-      showTab(currentTabId);
-    } else {
-      tabContent.innerHTML = '<p>Nenhuma aba encontrada. Clique no botão "+" para criar uma nova aba.</p>';
-    }
+  .item-controls {
+    margin-left: auto;
   }
 
-  async function renderTopics(tabId) {
-    const topics = await getTopics(tabId);
-    const topicsContainer = document.createElement('div');
-    topicsContainer.id = 'topics-container';
-    topics.forEach(topic => {
-      const topicElement = createTopicElement(topic);
-      topicsContainer.appendChild(topicElement);
-    });
-    const addTopicButton = document.createElement('button');
-    addTopicButton.id = 'add-topic-button';
-    addTopicButton.textContent = '+';
-    addTopicButton.onclick = () => addNewTopic(tabId);
-    topicsContainer.appendChild(addTopicButton);
-    topicSortable = Sortable.create(topicsContainer, {
-      handle: '.topic-drag-handle',
-      animation: 150,
-      onEnd: async function(evt) {
-        const topicElements = Array.from(topicsContainer.querySelectorAll('.topic'));
-        for (let i = 0; i < topicElements.length; i++) {
-          const topicId = topicElements[i].dataset.topicId;
-          await updateTopicOrder(topicId, i);
-        }
-      }
-    });
-    return topicsContainer;
+  .item-description {
+    order: 1;
   }
 
-  function enableTopicNameEditing(topic, topicNameElement) {
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = topic.name;
-    input.classList.add('topic-name-input');
-    input.style.width = `${input.value.length + 1}ch`;
-    input.addEventListener('input', () => {
-      input.style.width = `${input.value.length + 1}ch`;
-    });
-    const saveName = async () => {
-      const newName = input.value.trim();
-      if (newName && newName !== topic.name) {
-        await updateTopic(topic.id, newName);
-        topic.name = newName;
-      }
-      const newDiv = document.createElement('div');
-      newDiv.classList.add('topic-name');
-      newDiv.textContent = newName;
-      newDiv.ondblclick = (e) => {
-        e.stopPropagation();
-        enableTopicNameEditing(topic, newDiv);
-      };
-      input.parentElement.replaceChild(newDiv, input);
-    };
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        saveName();
-      }
-    });
-    input.addEventListener('blur', saveName);
-    topicNameElement.parentElement.replaceChild(input, topicNameElement);
-    input.focus();
+  .item-source {
+    order: 2;
   }
 
-  async function addNewTopic(tabId) {
-    const defaultName = "Novo tópico";
-    const topics = await getTopics(tabId);
-    const newOrder = topics.length;
-    const newTopicId = await addTopic(tabId, defaultName, newOrder);
-    const newTopic = { id: newTopicId, name: defaultName, order: newOrder, tabId };
-    const topicsContainer = document.getElementById('topics-container');
-    if (topicsContainer) {
-      const addTopicButton = document.getElementById('add-topic-button');
-      const newTopicElement = createTopicElement(newTopic);
-      topicsContainer.insertBefore(newTopicElement, addTopicButton);
-      const topicNameElement = newTopicElement.querySelector('.topic-name');
-      setTimeout(() => {
-        enableTopicNameEditing(newTopic, topicNameElement);
-      }, 300);
-    }
+  .item-controls {
+    order: 3;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  /* Ajuste de margens */
+  li.item {
+    padding: 12px 5px 12px 5px; 
   }
 
-  async function updateAllItemOrders() {
-    const itemLists = document.querySelectorAll('.item-list');
-    const promises = [];
-    itemLists.forEach(list => {
-      const newTopicId = list.dataset.topicId;
-      Array.from(list.children).forEach((child, index) => {
-        const itemId = child.dataset.itemId;
-        promises.push(updateItemOrder(itemId, newTopicId, index));
-      });
-    });
-    await Promise.all(promises);
+  li.item .item-title {
+    margin-left: 8px; 
   }
 
-  function renderItemForm(topicId) {
-    const itemForm = document.createElement('div');
-    itemForm.classList.add('item-form');
-    itemForm.innerHTML = `
-      <div class="form-group">
-        <label for="item-title-${topicId}">Título:</label>
-        <input type="text" id="item-title-${topicId}" name="item-title">
-      </div>
-      <div class="form-group">
-        <label for="item-link-${topicId}">Link:</label>
-        <input type="text" id="item-link-${topicId}" name="item-link">
-      </div>
-      <div class="form-group">
-        <label for="item-fonte-${topicId}">Fonte:</label>
-        <input type="text" id="item-fonte-${topicId}" name="item-fonte">
-      </div>
-      <div class="form-group">
-        <label for="item-description-${topicId}">Explicação:</label>
-        <textarea id="item-description-${topicId}" name="item-description"></textarea>
-      </div>
-      <button id="save-item-button-${topicId}">✓</button>
-    `;
-    itemForm.querySelector(`#save-item-button-${topicId}`).addEventListener('click', async () => {
-      const title = document.getElementById(`item-title-${topicId}`).value;
-      const link = document.getElementById(`item-link-${topicId}`).value;
-      const fonte = document.getElementById(`item-fonte-${topicId}`).value;
-      const description = document.getElementById(`item-description-${topicId}`).value || '';
-      if (title && link) {
-        const newItemId = await addItem(currentTabId, topicId, title, link, fonte, description);
-        document.getElementById(`item-title-${topicId}`).value = '';
-        document.getElementById(`item-link-${topicId}`).value = '';
-        document.getElementById(`item-fonte-${topicId}`).value = '';
-        document.getElementById(`item-description-${topicId}`).value = '';
-        const topicElement = document.querySelector(`.topic[data-topic-id="${topicId}"]`);
-        const itemList = topicElement.querySelector('.item-list');
-        const newItem = { id: newItemId, title, link, fonte, description, topicId, order: itemList.children.length };
-        const listItem = createItemElement(newItem);
-        itemList.appendChild(listItem);
-      } else {
-        alert('Por favor, preencha o título e o link.');
-      }
-    });
-    return itemForm;
+  li.item .item-middle {
+    padding: 0 5px; 
   }
 
-  await loadTabs();
+  /* Aumenta margem direita nos controles */
+  .item-controls {
+    padding-right: 30px; 
+    margin-left: 8px; 
+  }
 
-  const isMobileScreen = window.innerWidth <= 768;
-  sortable = Sortable.create(tabList, {
-    filter: '.no-drag',
-    ghostClass: 'sortable-ghost',
-    disabled: isMobileScreen,
-    onEnd: async function(evt) {
-      const children = Array.from(tabList.children).filter(child => child.dataset.tabId);
-      for (let i = 0; i < children.length; i++) {
-        const tabId = children[i].dataset.tabId;
-        await updateTabOrder(tabId, i);
-      }
-    }
-  });
-});
+  /* Alinhamento da fonte */
+  .fonte-container {
+    margin-left: 8px; 
+    padding-left: 0;
+  }
+
+  /* Ajuste de alinhamento geral */
+  li.item .item-middle,
+  li.item .item-controls {
+    padding-left: 8px; 
+  }
+
+  /* Remove margem extra da fonte */
+  .item-source {
+    margin-left: 0 !important;
+    padding-left: 5px;
+  }
+  
+  /* Ajuste final de posicionamento */
+  li.item .item-middle {
+    width: calc(100% - 10px); 
+    margin: 8px 0;
+  }
+}
+
+/* Mobile Tooltip Fix */
+@media only screen and (max-width: 768px) {
+  .item-description {
+    position: relative;
+    z-index: 1;
+  }
+
+  .tooltip {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 300px;
+    margin-left: 0;
+  }
+
+  .tooltip.active {
+    display: block;
+    z-index: 1001;
+  }
+
+  .item-description.active {
+    color: #2196F3;
+    font-weight: bold;
+  }
+}
