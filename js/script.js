@@ -1,4 +1,4 @@
-import { 
+import {
   initializeFirebase,
   getTabs,
   addTab,
@@ -88,6 +88,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       li.appendChild(titleLinkContainer);
 
+      // Controles: arrastar, editar e eliminar (nova posição)
+      const controlsDiv = document.createElement('div');
+      controlsDiv.classList.add('item-controls');
+      controlsDiv.style.marginLeft = '15px';
+      controlsDiv.style.marginBottom = '8px';
+
+      const dragHandle = document.createElement('span');
+      dragHandle.classList.add('drag-handle');
+      dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 4 16" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="2" cy="2" r="2"/>
+        <circle cx="2" cy="8" r="2"/>
+        <circle cx="2" cy="14" r="2"/>
+      </svg>`;
+      controlsDiv.appendChild(dragHandle);
+
+      const editButton = document.createElement('button');
+      editButton.classList.add('edit-button');
+      editButton.textContent = 'Editar';
+      editButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        toggleEditForm(item, li);
+      });
+      controlsDiv.appendChild(editButton);
+
+      const deleteButton = document.createElement('button');
+      deleteButton.classList.add('delete-button');
+      deleteButton.textContent = 'X';
+      deleteButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        deleteCurrentItem(item.id);
+      });
+      controlsDiv.appendChild(deleteButton);
+
+      li.appendChild(controlsDiv);
+
       // Container para explicação e fonte
       const middleDiv = document.createElement('div');
       middleDiv.classList.add('item-middle');
@@ -124,39 +159,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       middleDiv.appendChild(fonteDiv);
 
       li.appendChild(middleDiv);
-
-      // Controles: arrastar, editar e eliminar
-      const controlsDiv = document.createElement('div');
-      controlsDiv.classList.add('item-controls');
-
-      const dragHandle = document.createElement('span');
-      dragHandle.classList.add('drag-handle');
-      dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 4 16" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="2" cy="2" r="2"/>
-        <circle cx="2" cy="8" r="2"/>
-        <circle cx="2" cy="14" r="2"/>
-      </svg>`;
-      controlsDiv.appendChild(dragHandle);
-
-      const editButton = document.createElement('button');
-      editButton.classList.add('edit-button');
-      editButton.textContent = 'Editar';
-      editButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        toggleEditForm(item, li);
-      });
-      controlsDiv.appendChild(editButton);
-
-      const deleteButton = document.createElement('button');
-      deleteButton.classList.add('delete-button');
-      deleteButton.textContent = 'X';
-      deleteButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        deleteCurrentItem(item.id);
-      });
-      controlsDiv.appendChild(deleteButton);
-
-      li.appendChild(controlsDiv);
 
       return li;
     } else {
