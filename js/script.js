@@ -1,4 +1,4 @@
-import { 
+import {
   initializeFirebase,
   getTabs,
   addTab,
@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentTabId = null;
   let sortable;
   let topicSortable;
+  const isMobile = window.innerWidth <= 768;
 
   // Helper: Extract domain from a URL and remove "www." if present.
   function extractDomain(url) {
@@ -38,104 +39,211 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Updated: Create a DOM element for an item with left and right control containers
-  function createItemElement(item) {
-    const listItem = document.createElement('li');
-    listItem.dataset.itemId = item.id;
-
-    // Create left content container
-    const leftContent = document.createElement('div');
-    leftContent.classList.add('item-left');
-
-    // Title element
-    const titleElement = document.createElement('span');
-    titleElement.classList.add('item-title');
-    titleElement.textContent = item.title;
-    leftContent.appendChild(titleElement);
-
-    // Combined container for main link, question mark and fonte link
-    const linkContainer = document.createElement('span');
-    linkContainer.classList.add('item-link-container');
-
-    // Main link element (for item.link)
-    const mainLink = document.createElement('a');
-    mainLink.classList.add('item-link');
-    mainLink.target = '_blank';
-    mainLink.href = item.link;
-    mainLink.textContent = extractDomain(item.link);
-    linkContainer.appendChild(mainLink);
-
-    // Append question mark immediately after mainLink (no extra space)
-    const questionMark = document.createElement('span');
-    questionMark.classList.add('item-description');
-    questionMark.textContent = '?';
-    const tooltip = document.createElement('div');
-    tooltip.classList.add('tooltip');
-    tooltip.textContent = item.description || 'Sem descrição';
-    questionMark.appendChild(tooltip);
-    linkContainer.appendChild(questionMark);
-
-    // Fonte clickable link element (always a link)
-    const fonteLink = document.createElement('a');
-    fonteLink.classList.add('item-source');
-    fonteLink.target = '_blank';
-    if (item.fonte) {
-      fonteLink.href = item.fonte;
-      fonteLink.textContent = extractDomain(item.fonte);
-    } else {
-      fonteLink.textContent = '';
+  // Delete Topic
+  async function deleteCurrentTopic(topicId) {
+    const confirmDelete = confirm('Tem certeza que deseja excluir este tópico?');
+    if (confirmDelete) {
+      await deleteTopic(topicId);
+      const topicElement = document.querySelector(`.topic[data-topic-id="${topicId}"]`);
+      if (topicElement) topicElement.remove();
     }
-    fonteLink.style.marginLeft = '12px'; // extra separation from the question mark
-    linkContainer.appendChild(fonteLink);
-
-    leftContent.appendChild(linkContainer);
-
-    // Create right controls container
-    const rightControls = document.createElement('div');
-    rightControls.classList.add('item-right-controls');
-
-    // Drag handle for item reordering
-    const dragHandle = document.createElement('span');
-    dragHandle.classList.add('drag-handle');
-    dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 4 16" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="2" cy="2" r="2"/>
-      <circle cx="2" cy="8" r="2"/>
-      <circle cx="2" cy="14" r="2"/>
-    </svg>`;
-    rightControls.appendChild(dragHandle);
-
-    // Item options container (edit and delete buttons)
-    const itemOptions = document.createElement('div');
-    itemOptions.classList.add('item-options');
-
-    const editButton = document.createElement('button');
-    editButton.classList.add('edit-button');
-    editButton.textContent = 'Editar';
-    editButton.addEventListener('click', (event) => {
-      event.stopPropagation();
-      toggleEditForm(item, listItem);
-    });
-
-    const deleteButton = document.createElement('button');
-    deleteButton.textContent = 'X';
-    deleteButton.classList.add('delete-button');
-    deleteButton.addEventListener('click', (event) => {
-      event.stopPropagation();
-      deleteCurrentItem(item.id);
-    });
-
-    itemOptions.appendChild(editButton);
-    itemOptions.appendChild(deleteButton);
-    rightControls.appendChild(itemOptions);
-
-    // Append left and right containers to the list item
-    listItem.appendChild(leftContent);
-    listItem.appendChild(rightControls);
-
-    return listItem;
   }
 
-  // Helper: Create topic element and load its items asynchronously
+  // Delete Item
+  async function deleteCurrentItem(itemId) {
+    const confirmDelete = confirm('Tem certeza que deseja excluir este item?');
+    if (confirmDelete) {
+      await deleteItem(currentTabId, itemId);
+      const itemElement = document.querySelector(`li[data-item-id="${itemId}"]`);
+      if (itemElement) itemElement.remove();
+    }
+  }
+
+  // Create Item Element (mobile and desktop layouts)
+  function createItemElement(item) {
+    if (window.innerWidth <= 768) {
+      // Mobile layout
+      const li = document.createElement('li');
+      li.dataset.itemId = item.id;
+      li.classList.add('item');
+
+      // 1º linha: Título
+      const titleSpan = document.createElement('span');
+      titleSpan.classList.add('item-title');
+      titleSpan.textContent = item.title;
+      li.appendChild(titleSpan);
+
+      // 2º linha: Container para link, explicação e controles
+      const middleDiv = document.createElement('div');
+      middleDiv.classList.add('item-middle');
+
+      // Container para link e botão de explicação
+      const linkExpDiv = document.createElement('div');
+      linkExpDiv.classList.add('link-explanation');
+
+      const mainLink = document.createElement('a');
+      mainLink.classList.add('item-link');
+      mainLink.href = item.link;
+      mainLink.target = '_blank';
+      mainLink.textContent = extractDomain(item.link);
+      linkExpDiv.appendChild(mainLink);
+
+      const questionSpan = document.createElement('span');
+      questionSpan.classList.add('item-description');
+      questionSpan.textContent = '?';
+      const tooltip = document.createElement('div');
+      tooltip.classList.add('tooltip');
+      tooltip.textContent = item.description || 'Sem descrição';
+      questionSpan.appendChild(tooltip);
+      linkExpDiv.appendChild(questionSpan);
+
+      middleDiv.appendChild(linkExpDiv);
+
+      // Controles: arrastar, editar e eliminar
+      const controlsDiv = document.createElement('div');
+      controlsDiv.classList.add('item-controls');
+
+      const dragHandle = document.createElement('span');
+      dragHandle.classList.add('drag-handle');
+      dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 4 16" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="2" cy="2" r="2"/>
+        <circle cx="2" cy="8" r="2"/>
+        <circle cx="2" cy="14" r="2"/>
+      </svg>`;
+      controlsDiv.appendChild(dragHandle);
+
+      const editButton = document.createElement('button');
+      editButton.classList.add('edit-button');
+      editButton.textContent = 'Editar';
+      editButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        toggleEditForm(item, li);
+      });
+      controlsDiv.appendChild(editButton);
+
+      const deleteButton = document.createElement('button');
+      deleteButton.classList.add('delete-button');
+      deleteButton.textContent = 'X';
+      deleteButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        deleteCurrentItem(item.id);
+      });
+      controlsDiv.appendChild(deleteButton);
+
+      middleDiv.appendChild(controlsDiv);
+      li.appendChild(middleDiv);
+
+      // 3º linha: Fonte
+      const footerDiv = document.createElement('div');
+      footerDiv.classList.add('item-footer');
+
+      const fonteLink = document.createElement('a');
+      fonteLink.classList.add('item-source');
+      fonteLink.target = '_blank';
+      if (item.fonte) {
+        fonteLink.href = item.fonte;
+        fonteLink.textContent = extractDomain(item.fonte);
+      } else {
+        fonteLink.textContent = '';
+      }
+      footerDiv.appendChild(fonteLink);
+      li.appendChild(footerDiv);
+
+      return li;
+    } else {
+      // Desktop layout: nos desktops o título fica à esquerda e, imediatamente à direita, um container com:
+      // o link, o botão de explicação e, à direita deste, a fonte.
+      const listItem = document.createElement('li');
+      listItem.dataset.itemId = item.id;
+
+      const leftContent = document.createElement('div');
+      leftContent.classList.add('item-left');
+      leftContent.style.display = 'flex';
+      leftContent.style.alignItems = 'center';
+      leftContent.style.gap = '10px';
+
+      const titleElement = document.createElement('span');
+      titleElement.classList.add('item-title');
+      titleElement.textContent = item.title;
+      leftContent.appendChild(titleElement);
+
+      const detailsContainer = document.createElement('div');
+      detailsContainer.classList.add('item-details');
+      detailsContainer.style.display = 'flex';
+      detailsContainer.style.alignItems = 'center';
+      detailsContainer.style.gap = '8px';
+
+      const mainLink = document.createElement('a');
+      mainLink.classList.add('item-link');
+      mainLink.target = '_blank';
+      mainLink.href = item.link;
+      mainLink.textContent = extractDomain(item.link);
+      detailsContainer.appendChild(mainLink);
+
+      const explanationButton = document.createElement('span');
+      explanationButton.classList.add('item-description');
+      explanationButton.textContent = '?';
+      const tooltip = document.createElement('div');
+      tooltip.classList.add('tooltip');
+      tooltip.textContent = item.description || 'Sem descrição';
+      explanationButton.appendChild(tooltip);
+      detailsContainer.appendChild(explanationButton);
+
+      const fonteLink = document.createElement('a');
+      fonteLink.classList.add('item-source');
+      fonteLink.target = '_blank';
+      if (item.fonte) {
+        fonteLink.href = item.fonte;
+        fonteLink.textContent = extractDomain(item.fonte);
+      } else {
+        fonteLink.textContent = '';
+      }
+      detailsContainer.appendChild(fonteLink);
+
+      leftContent.appendChild(detailsContainer);
+
+      const rightControls = document.createElement('div');
+      rightControls.classList.add('item-right-controls');
+
+      const dragHandle = document.createElement('span');
+      dragHandle.classList.add('drag-handle');
+      dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 4 16" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="2" cy="2" r="2"/>
+        <circle cx="2" cy="8" r="2"/>
+        <circle cx="2" cy="14" r="2"/>
+      </svg>`;
+      rightControls.appendChild(dragHandle);
+
+      const itemOptions = document.createElement('div');
+      itemOptions.classList.add('item-options');
+
+      const editButton = document.createElement('button');
+      editButton.classList.add('edit-button');
+      editButton.textContent = 'Editar';
+      editButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        toggleEditForm(item, listItem);
+      });
+      itemOptions.appendChild(editButton);
+
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'X';
+      deleteButton.classList.add('delete-button');
+      deleteButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        deleteCurrentItem(item.id);
+      });
+      itemOptions.appendChild(deleteButton);
+      rightControls.appendChild(itemOptions);
+
+      listItem.appendChild(leftContent);
+      listItem.appendChild(rightControls);
+
+      return listItem;
+    }
+  }
+
+  // Create Topic Element with adjusted drag button placement
   function createTopicElement(topic) {
     const topicElement = document.createElement('div');
     topicElement.classList.add('topic');
@@ -152,6 +260,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       enableTopicNameEditing(topic, topicName);
     };
 
+    const topicTitleContainer = document.createElement('div');
+    topicTitleContainer.classList.add('topic-title-container');
+    topicTitleContainer.appendChild(topicName);
+
+    const topicDragHandle = document.createElement('span');
+    topicDragHandle.classList.add('topic-drag-handle');
+    topicDragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 4 16" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="2" cy="2" r="2"/>
+      <circle cx="2" cy="8" r="2"/>
+      <circle cx="2" cy="14" r="2"/>
+    </svg>`;
+    topicDragHandle.addEventListener('click', (e) => { e.stopPropagation(); });
+    topicTitleContainer.appendChild(topicDragHandle);
+
     const deleteButton = document.createElement('button');
     deleteButton.classList.add('topic-delete-button');
     deleteButton.textContent = 'X';
@@ -160,7 +282,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       deleteCurrentTopic(topic.id);
     };
 
-    topicHeader.appendChild(topicName);
+    topicHeader.appendChild(topicTitleContainer);
     topicHeader.appendChild(deleteButton);
 
     topicHeader.onclick = () => {
@@ -185,7 +307,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     itemList.classList.add('item-list');
     itemList.dataset.topicId = topic.id;
 
-    // Asynchronously load items for this topic and append them
     getItems(currentTabId, topic.id).then(items => {
       items.forEach(item => {
         const listItem = createItemElement(item);
@@ -260,16 +381,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     listItem.appendChild(editForm);
   }
 
-  async function deleteCurrentItem(itemId) {
-    const confirmDelete = confirm('Tem certeza que deseja excluir este item?');
-    if (confirmDelete) {
-      await deleteItem(currentTabId, itemId);
-      const li = document.querySelector(`[data-item-id="${itemId}"]`);
-      if (li) li.remove();
-    }
-  }
-
-  // Enable inline editing for tab names without full reload
   function enableTabNameEditing(tab, tabButton) {
     const container = tabButton.parentElement;
     const input = document.createElement('input');
@@ -382,6 +493,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.classList.remove('active');
       }
     });
+    tabContent.innerHTML = '<div class="loading">Carregando conteúdo...</div>';
     const topicsContainer = await renderTopics(tabId);
     tabContent.innerHTML = '';
     tabContent.appendChild(topicsContainer);
@@ -452,7 +564,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     addTopicButton.onclick = () => addNewTopic(tabId);
     topicsContainer.appendChild(addTopicButton);
     topicSortable = Sortable.create(topicsContainer, {
-      handle: '.topic-header',
+      handle: '.topic-drag-handle',
       animation: 150,
       onEnd: async function(evt) {
         const topicElements = Array.from(topicsContainer.querySelectorAll('.topic'));
@@ -577,11 +689,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await loadTabs();
 
-  const isMobile = window.innerWidth <= 768;
+  const isMobileScreen = window.innerWidth <= 768;
   sortable = Sortable.create(tabList, {
     filter: '.no-drag',
     ghostClass: 'sortable-ghost',
-    disabled: isMobile,
+    disabled: isMobileScreen,
     onEnd: async function(evt) {
       const children = Array.from(tabList.children).filter(child => child.dataset.tabId);
       for (let i = 0; i < children.length; i++) {
