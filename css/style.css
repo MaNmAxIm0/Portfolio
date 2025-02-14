@@ -127,11 +127,18 @@ header {
   background-color: #f1f3f4;
 }
 
+/* Topic Title Container (for mobile and desktop) */
+.topic-title-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .topic-name {
   font-weight: 500;
-  flex-grow: 1;
   font-size: 16px;
   color: #333333;
+  cursor: default;
 }
 
 .topic-name-input {
@@ -140,6 +147,31 @@ header {
   border: 2px solid #2196F3;
   border-radius: 4px;
   background-color: white;
+}
+
+/* Topic Controls */
+.topic-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Topic Drag Handle */
+.topic-drag-handle {
+  cursor: grab;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  padding: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.topic-drag-handle:hover {
+  background-color: #d5d5d5;
 }
 
 .topic-delete-button {
@@ -155,10 +187,6 @@ header {
 
 .topic-delete-button:hover {
   opacity: 1;
-}
-
-.topic-content {
-  padding: 20px;
 }
 
 .topic.collapsed .topic-content {
@@ -187,18 +215,17 @@ header {
   border-bottom: none;
 }
 
-.item-title {
+/* Desktop Item Styles */
+.item-left .item-title {
   margin-right: 15px;
   font-weight: 500;
-  color: #333333;
   word-break: break-word; 
 }
 
-/* Styles for the combined link container */
 .item-link-container {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.3em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .item-link {
@@ -214,6 +241,8 @@ header {
   color: #0D47A1;
 }
 
+/* Fonte link: same as item-link but italic and gray */
+.fonte-container .item-source,
 .item-source {
   flex-grow: 1;
   min-width: 100px; 
@@ -429,8 +458,16 @@ header {
   border-radius: 4px;
 }
 
+/* Loading Indicator */
+.loading {
+  font-size: 1.5em;
+  text-align: center;
+  padding: 20px;
+}
+
 /* Mobile adjustments */
 @media only screen and (max-width: 768px) {
+  /* Adjustments for existing desktop elements */
   .item-list li {
     flex-direction: column;
     align-items: center;
@@ -444,5 +481,58 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  .topic-drag-handle {
+    margin: 0 auto 8px auto;
+    display: block;
+  }
+
+  /* New Mobile Item Layout */
+  li.item {
+    list-style: none;
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  li.item .item-title {
+    font-weight: 500;
+    font-size: 16px;
+    margin-bottom: 5px;
+    display: block;
+    text-align: center;
+  }
+  li.item .item-middle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 5px;
+  }
+  li.item .link-explanation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  li.item .link-explanation .item-link {
+    text-decoration: none;
+    color: #1976D2;
+  }
+  li.item .item-description {
+    cursor: pointer;
+    position: relative;
+    color: #424242;
+    margin-left: 8px;
+  }
+  li.item .item-controls {
+    display: flex;
+    gap: 8px;
+  }
+  li.item .item-footer {
+    font-style: italic;
+    color: #555;
+    text-align: center;
+  }
+  li.item .item-footer .item-source {
+    text-decoration: none;
+    color: inherit;
   }
 }
