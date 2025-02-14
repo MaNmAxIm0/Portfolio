@@ -22,7 +22,7 @@ export async function getTabs() {
 
   if (snapshot.exists()) {
     return Object.entries(snapshot.val())
-      .map(([id, data]) => ({ id, ...data }))
+      .map(([id, data]) => ({ id, ...data}))
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   } else {
     return [];
@@ -72,25 +72,34 @@ export async function getItems(tabId, topicId) {
   if (snapshot.exists()) {
     return Object.entries(snapshot.val())
       .filter(([, item]) => item.tabId === tabId && item.topicId === topicId)
-      .map(([id, item]) => ({ id, ...item }));
+      .map(([id, item]) => ({ id, ...item }))
+      .sort((a, b) => ((a.order !== undefined) ? a.order : 9999) - ((b.order !== undefined) ? b.order : 9999));
   } else {
     return [];
   }
 }
 
-export async function addItem(tabId, topicId, title, link, description) {
+export async function addItem(tabId, topicId, title, link, fonte, description) {
   const itemsRef = ref(database, 'items');
-  await push(itemsRef, { tabId, topicId, title, link, description });
+  const newItemRef = push(itemsRef);
+  await set(newItemRef, { tabId, topicId, title, link, fonte, description });
+  return newItemRef.key;
 }
 
-export async function updateItem(tabId, itemId, topicId, title, link, description) {
+export async function updateItem(tabId, itemId, topicId, title, link, fonte, description) {
   const itemRef = ref(database, `items/${itemId}`);
-  await update(itemRef, { tabId, topicId, title, link, description });
+  await update(itemRef, { tabId, topicId, title, link, fonte, description });
 }
 
 export async function deleteItem(tabId, itemId) {
   const itemRef = ref(database, `items/${itemId}`);
   await remove(itemRef);
+}
+
+// New function: Update item order and topic assignment
+export async function updateItemOrder(itemId, topicId, order) {
+  const itemRef = ref(database, `items/${itemId}`);
+  await update(itemRef, { topicId, order });
 }
 
 // Topics operations
