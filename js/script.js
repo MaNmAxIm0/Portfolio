@@ -1,4 +1,4 @@
-import { 
+import {
   initializeFirebase,
   getTabs,
   addTab,
@@ -149,13 +149,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const dragHandle = document.createElement('span');
       dragHandle.classList.add('drag-handle');
-      dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 6 16" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="1" cy="2" r="1"/>
-        <circle cx="4" cy="2" r="1"/>
-        <circle cx="1" cy="8" r="1"/>
-        <circle cx="4" cy="8" r="1"/>
-        <circle cx="1" cy="14" r="1"/>
-        <circle cx="4" cy="14" r="1"/>
+      dragHandle.innerHTML = `<svg width="24" height="24" viewBox="0 0 8 24" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="1" cy="6" r="3" opacity="0.3"/>
+        <circle cx="7" cy="6" r="3" opacity="0.3"/>
+        <circle cx="1" cy="12" r="3" opacity="0.3"/>
+        <circle cx="7" cy="12" r="3" opacity="0.3"/>
+        <circle cx="1" cy="18" r="3" opacity="0.3"/>
+        <circle cx="7" cy="18" r="3" opacity="0.3"/>
       </svg>`;
       controlsDiv.appendChild(dragHandle);
 
@@ -238,13 +238,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const dragHandle = document.createElement('span');
       dragHandle.classList.add('drag-handle');
-      dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 6 16" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="1" cy="2" r="1"/>
-        <circle cx="4" cy="2" r="1"/>
-        <circle cx="1" cy="8" r="1"/>
-        <circle cx="4" cy="8" r="1"/>
-        <circle cx="1" cy="14" r="1"/>
-        <circle cx="4" cy="14" r="1"/>
+      dragHandle.innerHTML = `<svg width="24" height="24" viewBox="0 0 8 24" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="1" cy="6" r="3" opacity="0.3"/>
+        <circle cx="7" cy="6" r="3" opacity="0.3"/>
+        <circle cx="1" cy="12" r="3" opacity="0.3"/>
+        <circle cx="7" cy="12" r="3" opacity="0.3"/>
+        <circle cx="1" cy="18" r="3" opacity="0.3"/>
+        <circle cx="7" cy="18" r="3" opacity="0.3"/>
       </svg>`;
       rightControls.appendChild(dragHandle);
 
@@ -300,10 +300,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const topicDragHandle = document.createElement('span');
     topicDragHandle.classList.add('topic-drag-handle');
-    topicDragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 4 16" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="2" cy="2" r="2"/>
-      <circle cx="2" cy="8" r="2"/>
-      <circle cx="2" cy="14" r="2"/>
+    topicDragHandle.innerHTML = `<svg width="24" height="24" viewBox="0 0 8 24" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="1" cy="6" r="3" opacity="0.3"/>
+      <circle cx="7" cy="6" r="3" opacity="0.3"/>
+      <circle cx="1" cy="12" r="3" opacity="0.3"/>
+      <circle cx="7" cy="12" r="3" opacity="0.3"/>
+      <circle cx="1" cy="18" r="3" opacity="0.3"/>
+      <circle cx="7" cy="18" r="3" opacity="0.3"/>
     </svg>`;
     topicDragHandle.addEventListener('click', (e) => { e.stopPropagation(); });
     topicTitleContainer.appendChild(topicDragHandle);
