@@ -194,30 +194,46 @@ header {
   word-break: break-word; 
 }
 
-.item-link {
-  margin-right: 15px;
-  flex-grow: 1;
-  min-width: 100px; 
+/* Styles for the combined link container */
+.item-link-container {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3em;
 }
 
-.item-link a {
+.item-link {
+  flex-grow: 1;
+  min-width: 100px; 
   color: #1976D2;
   text-decoration: none;
   transition: color 0.2s ease;
   word-break: break-all;
 }
 
-.item-link a:hover {
+.item-link:hover {
   color: #0D47A1;
 }
 
+.item-source {
+  flex-grow: 1;
+  min-width: 100px; 
+  text-decoration: none;
+  transition: color 0.2s ease;
+  word-break: break-all;
+  font-style: italic;
+  color: #555;
+}
+
+.item-source:hover {
+  color: #555;
+}
+
 .item-description {
-  margin: 0 8px 0 15px;
   cursor: pointer;
   color: #424242;
   position: relative;
-  display: inline-flex; 
-  align-items: center; 
+  display: inline-flex;
+  align-items: center;
 }
 
 .tooltip {
@@ -244,7 +260,7 @@ header {
 .item-options {
   display: flex;
   gap: 10px;
-  margin-left: 8px;
+  margin-left: auto;
   align-items: center;
 }
 
