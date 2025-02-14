@@ -88,11 +88,47 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       li.appendChild(titleLinkContainer);
 
-      // Controles: arrastar, editar e eliminar (nova posição)
+      // Linha de controles e fonte
+      const middleDiv = document.createElement('div');
+      middleDiv.style.display = 'flex';
+      middleDiv.style.alignItems = 'center';
+      middleDiv.style.gap = '8px';
+      middleDiv.style.width = '100%';
+      middleDiv.style.marginLeft = '15px';
+
+      // Container para explicação + fonte
+      const infoContainer = document.createElement('div');
+      infoContainer.style.display = 'flex';
+      infoContainer.style.gap = '8px';
+      infoContainer.style.alignItems = 'center';
+
+      // Botão de explicação
+      const questionSpan = document.createElement('span');
+      questionSpan.classList.add('item-description');
+      questionSpan.textContent = '?';
+      const tooltip = document.createElement('div');
+      tooltip.classList.add('tooltip');
+      tooltip.textContent = item.description || 'Sem descrição';
+      questionSpan.appendChild(tooltip);
+      infoContainer.appendChild(questionSpan);
+
+      // Fonte
+      const fonteLink = document.createElement('a');
+      fonteLink.classList.add('item-source');
+      fonteLink.target = '_blank';
+      if (item.fonte) {
+        fonteLink.href = item.fonte;
+        fonteLink.textContent = extractDomain(item.fonte);
+      }
+      infoContainer.appendChild(fonteLink);
+
+      middleDiv.appendChild(infoContainer);
+
+      // Controles de arrastar/editar/excluir
       const controlsDiv = document.createElement('div');
-      controlsDiv.classList.add('item-controls');
-      controlsDiv.style.marginLeft = '15px';
-      controlsDiv.style.marginBottom = '8px';
+      controlsDiv.style.display = 'flex';
+      controlsDiv.style.gap = '8px';
+      controlsDiv.style.marginLeft = 'auto';
 
       const dragHandle = document.createElement('span');
       dragHandle.classList.add('drag-handle');
@@ -121,43 +157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       controlsDiv.appendChild(deleteButton);
 
-      li.appendChild(controlsDiv);
-
-      // Container para explicação e fonte
-      const middleDiv = document.createElement('div');
-      middleDiv.classList.add('item-middle');
-
-      // Container para explicação
-      const explanationDiv = document.createElement('div');
-      explanationDiv.classList.add('item-description-container');
-
-      const questionSpan = document.createElement('span');
-      questionSpan.classList.add('item-description');
-      questionSpan.textContent = '?';
-      const tooltip = document.createElement('div');
-      tooltip.classList.add('tooltip');
-      tooltip.textContent = item.description || 'Sem descrição';
-      questionSpan.appendChild(tooltip);
-      explanationDiv.appendChild(questionSpan);
-
-      middleDiv.appendChild(explanationDiv);
-
-      // Container para fonte
-      const fonteDiv = document.createElement('div');
-      fonteDiv.classList.add('item-fonte-container');
-
-      const fonteLink = document.createElement('a');
-      fonteLink.classList.add('item-source');
-      fonteLink.target = '_blank';
-      if (item.fonte) {
-        fonteLink.href = item.fonte;
-        fonteLink.textContent = extractDomain(item.fonte);
-      } else {
-        fonteLink.textContent = '';
-      }
-      fonteDiv.appendChild(fonteLink);
-      middleDiv.appendChild(fonteDiv);
-
+      middleDiv.appendChild(controlsDiv);
       li.appendChild(middleDiv);
 
       return li;
