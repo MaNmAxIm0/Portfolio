@@ -257,37 +257,66 @@ header {
   display: block;
 }
 
+/* Item Options */
 .item-options {
   display: flex;
   gap: 10px;
-  margin-left: auto;
   align-items: center;
 }
 
-.item-options button {
+.item-right-controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.drag-handle {
+  cursor: grab;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  padding: 4px;
+  transition: background-color 0.3s ease;
+  margin-right: 10px;
+}
+
+.drag-handle:hover {
+  background-color: #d5d5d5;
+}
+
+.edit-button {
+  background-color: #f8f9fa;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   padding: 5px 10px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 14px;
+  color: #333;
+}
+
+.edit-button:hover {
+  background-color: #e0e0e0;
+}
+
+.delete-button {
+  background-color: #ff4d4f;
   border: none;
-  background: none;
-  color: #424242;
-  transition: color 0.2s ease;
+  border-radius: 4px;
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 14px;
+  color: white;
 }
 
-.item-options button:hover {
-  color: #1976D2;
-}
-
-.item-options .delete-button {
-  color: #000000;
-  font-weight: bold;
-}
-
-.item-options .delete-button:hover {
-  color: #333333;
-}
-
-.item-list li:has(.item-form) .item-options {
-  display: none;
+.delete-button:hover {
+  background-color: #ff7875;
 }
 
 /* Item Form */
