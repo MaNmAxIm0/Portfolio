@@ -38,16 +38,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Helper: Create a DOM element for an item
+  // Updated: Create a DOM element for an item with left and right control containers
   function createItemElement(item) {
     const listItem = document.createElement('li');
     listItem.dataset.itemId = item.id;
+
+    // Create left content container
+    const leftContent = document.createElement('div');
+    leftContent.classList.add('item-left');
 
     // Title element
     const titleElement = document.createElement('span');
     titleElement.classList.add('item-title');
     titleElement.textContent = item.title;
-    listItem.appendChild(titleElement);
+    leftContent.appendChild(titleElement);
 
     // Combined container for main link, question mark and fonte link
     const linkContainer = document.createElement('span');
@@ -84,12 +88,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     fonteLink.style.marginLeft = '12px'; // extra separation from the question mark
     linkContainer.appendChild(fonteLink);
 
-    listItem.appendChild(linkContainer);
+    leftContent.appendChild(linkContainer);
 
+    // Create right controls container
+    const rightControls = document.createElement('div');
+    rightControls.classList.add('item-right-controls');
+
+    // Drag handle for item reordering
+    const dragHandle = document.createElement('span');
+    dragHandle.classList.add('drag-handle');
+    dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 4 16" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="2" cy="2" r="2"/>
+      <circle cx="2" cy="8" r="2"/>
+      <circle cx="2" cy="14" r="2"/>
+    </svg>`;
+    rightControls.appendChild(dragHandle);
+
+    // Item options container (edit and delete buttons)
     const itemOptions = document.createElement('div');
     itemOptions.classList.add('item-options');
 
     const editButton = document.createElement('button');
+    editButton.classList.add('edit-button');
     editButton.textContent = 'Editar';
     editButton.addEventListener('click', (event) => {
       event.stopPropagation();
@@ -106,7 +126,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     itemOptions.appendChild(editButton);
     itemOptions.appendChild(deleteButton);
-    listItem.appendChild(itemOptions);
+    rightControls.appendChild(itemOptions);
+
+    // Append left and right containers to the list item
+    listItem.appendChild(leftContent);
+    listItem.appendChild(rightControls);
 
     return listItem;
   }
@@ -170,6 +194,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       Sortable.create(itemList, {
         group: 'items',
         animation: 150,
+        handle: '.drag-handle',
         onEnd: async function(evt) {
           await updateAllItemOrders();
         }
@@ -382,16 +407,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
       tabContainer.appendChild(tabButton);
-      if (tab.id === currentTabId) {
-        const deleteButton = document.createElement('button');
-        deleteButton.classList.add('tab-delete-button');
-        deleteButton.textContent = 'X';
-        deleteButton.addEventListener('click', (event) => {
-          event.stopPropagation();
-          deleteCurrentTab(tab.id);
-        });
-        tabContainer.appendChild(deleteButton);
-      }
+      const deleteButton = document.createElement('button');
+      deleteButton.classList.add('tab-delete-button');
+      deleteButton.textContent = 'X';
+      deleteButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        deleteCurrentTab(tab.id);
+      });
+      tabContainer.appendChild(deleteButton);
+
       listItem.appendChild(tabContainer);
       tabList.appendChild(listItem);
     });
@@ -553,9 +577,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await loadTabs();
 
+  const isMobile = window.innerWidth <= 768;
   sortable = Sortable.create(tabList, {
     filter: '.no-drag',
     ghostClass: 'sortable-ghost',
+    disabled: isMobile,
     onEnd: async function(evt) {
       const children = Array.from(tabList.children).filter(child => child.dataset.tabId);
       for (let i = 0; i < children.length; i++) {
