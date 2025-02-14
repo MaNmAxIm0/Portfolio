@@ -62,17 +62,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Create Item Element (mobile and desktop layouts)
   function createItemElement(item) {
     if (window.innerWidth <= 768) {
-      // Mobile layout
+      // Novo layout móvel atualizado
       const li = document.createElement('li');
       li.dataset.itemId = item.id;
       li.classList.add('item');
+      li.style.padding = '12px 15px';
+      li.style.gap = '8px';
 
-      // Container para título e link
+      // Linha 1: Título + Link + Explicação
       const titleLinkContainer = document.createElement('div');
       titleLinkContainer.style.display = 'flex';
       titleLinkContainer.style.gap = '8px';
       titleLinkContainer.style.alignItems = 'center';
       titleLinkContainer.style.marginBottom = '8px';
+      titleLinkContainer.style.width = '100%';
 
       const titleSpan = document.createElement('span');
       titleSpan.classList.add('item-title');
@@ -86,23 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       mainLink.textContent = extractDomain(item.link);
       titleLinkContainer.appendChild(mainLink);
 
-      li.appendChild(titleLinkContainer);
-
-      // Linha de controles e fonte
-      const middleDiv = document.createElement('div');
-      middleDiv.style.display = 'flex';
-      middleDiv.style.alignItems = 'center';
-      middleDiv.style.gap = '8px';
-      middleDiv.style.width = '100%';
-      middleDiv.style.marginLeft = '15px';
-
-      // Container para explicação + fonte
-      const infoContainer = document.createElement('div');
-      infoContainer.style.display = 'flex';
-      infoContainer.style.gap = '8px';
-      infoContainer.style.alignItems = 'center';
-
-      // Botão de explicação
+      // Botão de explicação na mesma linha do link
       const questionSpan = document.createElement('span');
       questionSpan.classList.add('item-description');
       questionSpan.textContent = '?';
@@ -110,9 +97,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       tooltip.classList.add('tooltip');
       tooltip.textContent = item.description || 'Sem descrição';
       questionSpan.appendChild(tooltip);
-      infoContainer.appendChild(questionSpan);
+      titleLinkContainer.appendChild(questionSpan);
 
-      // Fonte
+      li.appendChild(titleLinkContainer);
+
+      // Linha 2: Fonte + Controles
+      const middleDiv = document.createElement('div');
+      middleDiv.style.display = 'flex';
+      middleDiv.style.justifyContent = 'space-between';
+      middleDiv.style.alignItems = 'center';
+      middleDiv.style.width = '100%';
+      middleDiv.style.marginLeft = '15px';
+
+      // Container fonte
+      const fonteContainer = document.createElement('div');
+      fonteContainer.style.display = 'flex';
+      fonteContainer.style.alignItems = 'center';
+      fonteContainer.style.gap = '8px';
+
       const fonteLink = document.createElement('a');
       fonteLink.classList.add('item-source');
       fonteLink.target = '_blank';
@@ -120,15 +122,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         fonteLink.href = item.fonte;
         fonteLink.textContent = extractDomain(item.fonte);
       }
-      infoContainer.appendChild(fonteLink);
+      fonteContainer.appendChild(fonteLink);
 
-      middleDiv.appendChild(infoContainer);
+      middleDiv.appendChild(fonteContainer);
 
-      // Controles de arrastar/editar/excluir
+      // Controles
       const controlsDiv = document.createElement('div');
       controlsDiv.style.display = 'flex';
       controlsDiv.style.gap = '8px';
-      controlsDiv.style.marginLeft = 'auto';
 
       const dragHandle = document.createElement('span');
       dragHandle.classList.add('drag-handle');
