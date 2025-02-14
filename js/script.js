@@ -1,4 +1,4 @@
-import {
+import { 
   initializeFirebase,
   getTabs,
   addTab,
