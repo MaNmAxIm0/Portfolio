@@ -596,4 +596,33 @@ header {
     width: 100%;
     padding-left: 15px;
   }
+  li.item .item-middle {
+    padding: 0 15px;
+    width: calc(100% - 30px);
+    margin: 8px 0;
+  }
+  
+  .item-source {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-left: 8px;
+  }
+
+  .item-controls {
+    margin-left: auto;
+  }
+
+  .item-description {
+    order: 1;
+  }
+
+  .item-source {
+    order: 2;
+  }
+
+  .item-controls {
+    order: 3;
+  }
 }
