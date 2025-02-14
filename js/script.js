@@ -1,4 +1,4 @@
-import { 
+import {
   initializeFirebase,
   getTabs,
   addTab,
@@ -67,26 +67,34 @@ document.addEventListener('DOMContentLoaded', async () => {
       li.dataset.itemId = item.id;
       li.classList.add('item');
 
-      // 1º linha: Título
+      // Container para título e link
+      const titleLinkContainer = document.createElement('div');
+      titleLinkContainer.style.display = 'flex';
+      titleLinkContainer.style.gap = '8px';
+      titleLinkContainer.style.alignItems = 'center';
+      titleLinkContainer.style.marginBottom = '8px';
+
       const titleSpan = document.createElement('span');
       titleSpan.classList.add('item-title');
       titleSpan.textContent = item.title;
-      li.appendChild(titleSpan);
-
-      // 2º linha: Container para link, explicação e controles
-      const middleDiv = document.createElement('div');
-      middleDiv.classList.add('item-middle');
-
-      // Container para link e botão de explicação
-      const linkExpDiv = document.createElement('div');
-      linkExpDiv.classList.add('link-explanation');
+      titleLinkContainer.appendChild(titleSpan);
 
       const mainLink = document.createElement('a');
       mainLink.classList.add('item-link');
       mainLink.href = item.link;
       mainLink.target = '_blank';
       mainLink.textContent = extractDomain(item.link);
-      linkExpDiv.appendChild(mainLink);
+      titleLinkContainer.appendChild(mainLink);
+
+      li.appendChild(titleLinkContainer);
+
+      // Container para explicação e fonte
+      const middleDiv = document.createElement('div');
+      middleDiv.classList.add('item-middle');
+
+      // Container para explicação
+      const explanationDiv = document.createElement('div');
+      explanationDiv.classList.add('item-description-container');
 
       const questionSpan = document.createElement('span');
       questionSpan.classList.add('item-description');
@@ -95,9 +103,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       tooltip.classList.add('tooltip');
       tooltip.textContent = item.description || 'Sem descrição';
       questionSpan.appendChild(tooltip);
-      linkExpDiv.appendChild(questionSpan);
+      explanationDiv.appendChild(questionSpan);
 
-      middleDiv.appendChild(linkExpDiv);
+      middleDiv.appendChild(explanationDiv);
+
+      // Container para fonte
+      const fonteDiv = document.createElement('div');
+      fonteDiv.classList.add('item-fonte-container');
+
+      const fonteLink = document.createElement('a');
+      fonteLink.classList.add('item-source');
+      fonteLink.target = '_blank';
+      if (item.fonte) {
+        fonteLink.href = item.fonte;
+        fonteLink.textContent = extractDomain(item.fonte);
+      } else {
+        fonteLink.textContent = '';
+      }
+      fonteDiv.appendChild(fonteLink);
+      middleDiv.appendChild(fonteDiv);
+
+      li.appendChild(middleDiv);
 
       // Controles: arrastar, editar e eliminar
       const controlsDiv = document.createElement('div');
@@ -130,24 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       controlsDiv.appendChild(deleteButton);
 
-      middleDiv.appendChild(controlsDiv);
-      li.appendChild(middleDiv);
-
-      // 3º linha: Fonte
-      const footerDiv = document.createElement('div');
-      footerDiv.classList.add('item-footer');
-
-      const fonteLink = document.createElement('a');
-      fonteLink.classList.add('item-source');
-      fonteLink.target = '_blank';
-      if (item.fonte) {
-        fonteLink.href = item.fonte;
-        fonteLink.textContent = extractDomain(item.fonte);
-      } else {
-        fonteLink.textContent = '';
-      }
-      footerDiv.appendChild(fonteLink);
-      li.appendChild(footerDiv);
+      li.appendChild(controlsDiv);
 
       return li;
     } else {
