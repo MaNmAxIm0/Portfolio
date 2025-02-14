@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebas
 import { getDatabase, ref, push, get, update, remove, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 // Your web app's Firebase configuration
-const firebaseConfig = {  
+const firebaseConfig = {
   databaseURL: "https://portfolio-maximo-default-rtdb.europe-west1.firebasedatabase.app/",
 };
 
