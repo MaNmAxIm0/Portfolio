@@ -626,3 +626,61 @@ header {
     order: 3;
   }
 }
+
+@media only screen and (max-width: 768px) {
+  /* Ajuste de margens */
+  li.item {
+    padding: 12px 8px 12px 8px; 
+  }
+
+  li.item .item-title {
+    margin-left: 8px; 
+  }
+
+  li.item .item-middle {
+    padding: 0 8px; 
+  }
+
+  /* Aumenta margem direita nos controles */
+  .item-controls {
+    padding-right: 15px;
+  }
+
+  /* Drag handle mais claro */
+  .drag-handle {
+    background-color: #eee;
+  }
+
+  .drag-handle svg circle {
+    fill: #999;
+  }
+}
+
+/* Mobile Tooltip Fix */
+@media only screen and (max-width: 768px) {
+  .item-description {
+    position: relative;
+    z-index: 1;
+  }
+
+  .tooltip {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 300px;
+    margin-left: 0;
+  }
+
+  .tooltip.active {
+    display: block;
+    z-index: 1001;
+  }
+
+  .item-description.active {
+    color: #2196F3;
+    font-weight: bold;
+  }
+}
