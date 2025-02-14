@@ -1,6 +1,6 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  margin: 0; 
+  margin: 0;
   background-color: #ffffff;
   color: #333333;
 }
@@ -427,4 +427,22 @@ header {
 .topic .item-form {
   margin: 10px 0 0 0;
   border-radius: 4px;
+}
+
+/* Mobile adjustments */
+@media only screen and (max-width: 768px) {
+  .item-list li {
+    flex-direction: column;
+    align-items: center;
+  }
+  .item-left {
+    text-align: center;
+  }
+  .item-right-controls {
+    margin-left: 0;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
