@@ -96,8 +96,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       const tooltip = document.createElement('div');
       tooltip.classList.add('tooltip');
       tooltip.textContent = item.description || 'Sem descrição';
-      questionSpan.appendChild(tooltip);
+      
+      // Adicionar evento de clique para dispositivos móveis
+      questionSpan.addEventListener('click', (e) => {
+        e.stopPropagation();
+        tooltip.classList.toggle('active');
+        questionSpan.classList.toggle('active');
+      });
+      
+      // Fechar tooltip ao clicar fora
+      document.addEventListener('click', (e) => {
+        if (!questionSpan.contains(e.target)) {
+          tooltip.classList.remove('active');
+          questionSpan.classList.remove('active');
+        }
+      });
+
       titleLinkContainer.appendChild(questionSpan);
+      questionSpan.appendChild(tooltip);
 
       li.appendChild(titleLinkContainer);
 
@@ -133,10 +149,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const dragHandle = document.createElement('span');
       dragHandle.classList.add('drag-handle');
-      dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 4 16" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="2" cy="2" r="2"/>
-        <circle cx="2" cy="8" r="2"/>
-        <circle cx="2" cy="14" r="2"/>
+      dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 6 16" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="1" cy="2" r="1"/>
+        <circle cx="4" cy="2" r="1"/>
+        <circle cx="1" cy="8" r="1"/>
+        <circle cx="4" cy="8" r="1"/>
+        <circle cx="1" cy="14" r="1"/>
+        <circle cx="4" cy="14" r="1"/>
       </svg>`;
       controlsDiv.appendChild(dragHandle);
 
@@ -219,10 +238,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const dragHandle = document.createElement('span');
       dragHandle.classList.add('drag-handle');
-      dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 4 16" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="2" cy="2" r="2"/>
-        <circle cx="2" cy="8" r="2"/>
-        <circle cx="2" cy="14" r="2"/>
+      dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 6 16" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="1" cy="2" r="1"/>
+        <circle cx="4" cy="2" r="1"/>
+        <circle cx="1" cy="8" r="1"/>
+        <circle cx="4" cy="8" r="1"/>
+        <circle cx="1" cy="14" r="1"/>
+        <circle cx="4" cy="14" r="1"/>
       </svg>`;
       rightControls.appendChild(dragHandle);
 
