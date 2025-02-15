@@ -93,45 +93,55 @@ document.addEventListener('DOMContentLoaded', async () => {
       const questionSpan = document.createElement('span');
       questionSpan.classList.add('item-description');
       questionSpan.textContent = '?';
+
+      const tooltipBackdrop = document.createElement('div');
+      tooltipBackdrop.classList.add('tooltip-backdrop');
+      document.body.appendChild(tooltipBackdrop);
+
       const tooltip = document.createElement('div');
       tooltip.classList.add('tooltip');
-      
+
       // Botão de fechar
-      const closeButton = document.createElement('div');
+      const closeButton = document.createElement('button');
       closeButton.classList.add('tooltip-close');
       closeButton.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M13 1L1 13M1 1l12 12" stroke="#666" stroke-width="2" stroke-linecap="round"/>
       </svg>`;
-      
-      closeButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        tooltip.classList.remove('active');
-        questionSpan.classList.remove('active');
-      });
 
-      tooltip.appendChild(closeButton);
       const tooltipText = document.createElement('div');
       tooltipText.textContent = item.description || 'Sem descrição';
+
+      tooltip.appendChild(closeButton);
       tooltip.appendChild(tooltipText);
-      
-      // Atualizar evento de clique
+      document.body.appendChild(tooltip);
+
+      const closeTooltip = () => {
+        tooltip.classList.remove('active');
+        tooltipBackdrop.classList.remove('active');
+        questionSpan.classList.remove('active');
+      };
+
+      closeButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeTooltip();
+      });
+
+      tooltipBackdrop.addEventListener('click', closeTooltip);
+
       questionSpan.addEventListener('click', (e) => {
         e.stopPropagation();
         const wasActive = tooltip.classList.contains('active');
-        tooltip.classList.toggle('active', !wasActive);
-        questionSpan.classList.toggle('active', !wasActive);
-      });
-      
-      // Fechar tooltip ao clicar fora
-      document.addEventListener('click', (e) => {
-        if (!questionSpan.contains(e.target)) {
-          tooltip.classList.remove('active');
-          questionSpan.classList.remove('active');
+        
+        if (wasActive) {
+          closeTooltip();
+        } else {
+          tooltip.classList.add('active');
+          tooltipBackdrop.classList.add('active');
+          questionSpan.classList.add('active');
         }
       });
 
       titleLinkContainer.appendChild(questionSpan);
-      questionSpan.appendChild(tooltip);
 
       li.appendChild(titleLinkContainer);
 
@@ -234,26 +244,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       explanationButton.textContent = '?';
       const tooltip = document.createElement('div');
       tooltip.classList.add('tooltip');
-      tooltip.innerHTML = `
-        <div class="tooltip-close">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M13 1L1 13M1 1l12 12" stroke="#666" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div>${item.description || 'Sem descrição'}</div>
-      `;
+      tooltip.innerHTML = `<div>${item.description || 'Sem descrição'}</div>`;
       explanationButton.appendChild(tooltip);
-      tooltip.querySelector('.tooltip-close').addEventListener('click', (e) => {
-        e.stopPropagation();
-        tooltip.classList.remove('active');
-        explanationButton.classList.remove('active');
-      });
-      explanationButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const wasActive = tooltip.classList.contains('active');
-        tooltip.classList.toggle('active', !wasActive);
-        explanationButton.classList.toggle('active', !wasActive);
-      });
+
       detailsContainer.appendChild(explanationButton);
 
       const fonteLink = document.createElement('a');
