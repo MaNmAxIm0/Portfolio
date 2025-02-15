@@ -217,7 +217,7 @@ header {
 
 /* Desktop Item Styles */
 .item-left .item-title {
-  margin-right: 20px;
+  margin-right: 4px;  
   font-weight: 500;
   word-break: break-word; 
 }
@@ -225,7 +225,7 @@ header {
 .item-link-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;  
 }
 
 .item-link {
@@ -235,6 +235,7 @@ header {
   text-decoration: none;
   transition: color 0.2s ease;
   word-break: break-all;
+  margin-right: 2px;  
 }
 
 .item-link:hover {
@@ -251,6 +252,7 @@ header {
   word-break: break-all;
   font-style: italic;
   color: #555;
+  margin-left: 4px;  
 }
 
 .item-source:hover {
@@ -260,41 +262,75 @@ header {
 .item-description {
   cursor: pointer;
   color: #424242;
-  position: relative;
   display: inline-flex;
   align-items: center;
+  margin: 0 4px;  
 }
 
-.tooltip {
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
-  max-width: 300px;
-  padding: 25px 15px 15px;
+/* Item details specific style */
+.item-details {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.tooltip-close {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  padding: 5px;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.2s;
+/* Desktop tooltip behavior */
+@media screen and (min-width: 769px) {
+  .tooltip {
+    position: absolute;
+    left: calc(100% + 10px);  
+    top: 50%;
+    transform: translateY(-50%);
+    width: 300px;
+    padding: 15px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 1000;
+  }
+
+  .item-description {
+    position: relative;
+  }
+
+  /* Show tooltip on hover for desktop */
+  .item-description:hover .tooltip {
+    display: block;
+  }
+
+  /* Hide close button on desktop */
+  .tooltip .tooltip-close {
+    display: none;
+  }
 }
 
-.tooltip-close:hover {
-  opacity: 1;
-}
+/* Mobile tooltip behavior (keeps existing click behavior) */
+@media screen and (max-width: 768px) {
+  .tooltip {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 300px;
+    padding: 25px 15px 15px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 1001;
+  }
 
-.tooltip-close svg {
-  display: block;
-}
+  .tooltip .tooltip-close {
+    display: block;
+  }
 
-.item-description:hover .tooltip {
-  display: block;
+  .tooltip.active {
+    display: block;
+  }
 }
 
 /* Item Options */
@@ -710,4 +746,40 @@ header {
     color: #2196F3;
     font-weight: bold;
   }
+}
+
+.tooltip-close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 5px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  background: none;
+  border: none;
+}
+
+.tooltip-close:hover {
+  opacity: 1;
+}
+
+.tooltip-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 999;
+}
+
+.tooltip-backdrop.active {
+  display: block;
+}
+
+.item-description.active {
+  color: #2196F3;
+  font-weight: bold;
 }
