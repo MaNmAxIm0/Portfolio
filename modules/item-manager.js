@@ -10,7 +10,7 @@ export class ItemManager {
   setCurrentTabIdGetter(getter) {
     this.getCurrentTabId = getter;
   }
-
+ 
   createItemList(topicId) {
     const itemList = document.createElement('ul');
     itemList.classList.add('item-list');
