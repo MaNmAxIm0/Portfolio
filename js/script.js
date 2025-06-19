@@ -17,11 +17,11 @@ import {
   updateItemOrder
 } from './firebase.js';
 
-import { TabManager } from './modules/tab-manager.js';
-import { TopicManager } from './modules/topic-manager.js';
-import { ItemManager } from './modules/item-manager.js';
-import { SearchManager } from './modules/search-manager.js';
-import { UIUtils } from './modules/ui-utils.js';
+import { TabManager } from 'modules/tab-manager.js';
+import { TopicManager } from 'modules/topic-manager.js';
+import { ItemManager } from 'modules/item-manager.js';
+import { SearchManager } from 'modules/search-manager.js';
+import { UIUtils } from 'modules/ui-utils.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Initialize Firebase
