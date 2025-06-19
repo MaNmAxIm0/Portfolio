@@ -1,7 +1,10 @@
 export class SearchManager {
   constructor() {
     this.currentSearchTerm = '';
-    this.tabManager = null; 
+    this.tabManager = null;
+    this.secretSequence = '';
+    this.targetSequence = 'bia';
+    this.secretTabShown = false;
   }
 
   setTabManager(tabManager) {
@@ -14,6 +17,10 @@ export class SearchManager {
 
     searchInput.addEventListener('input', (e) => {
       this.currentSearchTerm = e.target.value.toLowerCase().trim();
+      
+      // Check for secret sequence
+      this.checkSecretSequence(this.currentSearchTerm);
+      
       this.filterContentAndSwitchTab();
       clearSearch.style.display = this.currentSearchTerm ? 'block' : 'none';
     });
@@ -24,6 +31,15 @@ export class SearchManager {
       this.filterContent();
       clearSearch.style.display = 'none';
     });
+  }
+
+  checkSecretSequence(searchTerm) {
+    if (searchTerm === this.targetSequence) {
+      if (this.tabManager) {
+        this.tabManager.showSecretTab();
+        this.secretTabShown = true;
+      }
+    }
   }
 
   async filterContentAndSwitchTab() {
