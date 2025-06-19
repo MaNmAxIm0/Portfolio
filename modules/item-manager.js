@@ -4,7 +4,7 @@ export class ItemManager {
   constructor(currentTabId, uiUtils) {
     this.currentTabId = currentTabId;
     this.uiUtils = uiUtils;
-    this.getCurrentTabId = null;
+    this.getCurrentTabId = null; 
   }
 
   setCurrentTabIdGetter(getter) {
