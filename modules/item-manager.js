@@ -1,4 +1,4 @@
-import { getItems, addItem, updateItem, deleteItem, updateItemOrder } from '../firebase.js';
+import { getItems, addItem, updateItem, deleteItem, updateItemOrder } from 'modules/firebase.js';
 
 export class ItemManager {
   constructor(currentTabId, uiUtils) {
