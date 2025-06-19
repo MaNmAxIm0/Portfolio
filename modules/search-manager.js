@@ -68,7 +68,7 @@ export class SearchManager {
 
   async countMatchesInTab(tabId) {
     // Import getTopics and getItems dynamically to avoid circular imports
-    const { getTopics, getItems } = await import('../firebase.js');
+    const { getTopics, getItems } = await import('../js/firebase.js');
     
     const topics = await getTopics(tabId);
     let totalMatches = 0;
