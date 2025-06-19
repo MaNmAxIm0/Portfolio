@@ -1,4 +1,4 @@
-export class UIUtils {
+export class UIUtils { 
   // Helper: Extract domain from a URL and remove "www." if present.
   extractDomain(url) {
     try { 
