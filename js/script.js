@@ -15,7 +15,7 @@ import {
   deleteTopic,
   updateTopicOrder,
   updateItemOrder
-} from 'js/firebase.js';
+} from './firebase.js';
 
 import { TabManager } from 'modules/tab-manager.js';
 import { TopicManager } from 'modules/topic-manager.js';
