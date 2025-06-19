@@ -1,5 +1,5 @@
 export class SearchManager {
-  constructor() {
+  constructor() { 
     this.currentSearchTerm = '';
     this.tabManager = null;
   }
