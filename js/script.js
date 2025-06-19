@@ -1,5 +1,5 @@
 import {
-  initializeFirebase,
+  initializeFirebase, 
   getTabs,
   addTab,
   updateTab,
