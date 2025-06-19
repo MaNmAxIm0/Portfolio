@@ -4,7 +4,7 @@ export class ItemManager {
   constructor(currentTabId, uiUtils) {
     this.currentTabId = currentTabId;
     this.uiUtils = uiUtils;
-    this.getCurrentTabId = null; 
+    this.getCurrentTabId = null;
   }
 
   setCurrentTabIdGetter(getter) {
@@ -294,6 +294,26 @@ export class ItemManager {
     return true;
   }
 
+  async validateUniqueLink(link, currentItemId = null) {
+    // Get all topics for current tab
+    const { getTopics, getItems } = await import('../firebase.js');
+    const topics = await getTopics(this.getCurrentTabId());
+    
+    // Check all items across all topics in current tab
+    for (const topic of topics) {
+      const items = await getItems(this.getCurrentTabId(), topic.id);
+      for (const item of items) {
+        // Skip current item when editing
+        if (currentItemId && item.id === currentItemId) continue;
+        
+        if (item.link.toLowerCase().trim() === link.toLowerCase().trim()) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   toggleEditForm(item, listItem) {
     const existingForm = listItem.querySelector('.item-form');
     if (existingForm) {
@@ -330,9 +350,16 @@ export class ItemManager {
       
       if (newTitle && newLink) {
         // Check for duplicate title (excluding current item)
-        const isUnique = await this.validateUniqueTitle(newTitle, item.id);
-        if (!isUnique) {
+        const isTitleUnique = await this.validateUniqueTitle(newTitle, item.id);
+        if (!isTitleUnique) {
           alert('Já existe um item com este título. Por favor, escolha um título diferente.');
+          return;
+        }
+        
+        // Check for duplicate link (excluding current item)
+        const isLinkUnique = await this.validateUniqueLink(newLink, item.id);
+        if (!isLinkUnique) {
+          alert('Já existe um item com este link. Por favor, use um link diferente.');
           return;
         }
         
@@ -383,9 +410,16 @@ export class ItemManager {
       
       if (title && link) {
         // Check for duplicate title
-        const isUnique = await this.validateUniqueTitle(title);
-        if (!isUnique) {
+        const isTitleUnique = await this.validateUniqueTitle(title);
+        if (!isTitleUnique) {
           alert('Já existe um item com este título. Por favor, escolha um título diferente.');
+          return;
+        }
+        
+        // Check for duplicate link
+        const isLinkUnique = await this.validateUniqueLink(link);
+        if (!isLinkUnique) {
+          alert('Já existe um item com este link. Por favor, use um link diferente.');
           return;
         }
         
