@@ -1,4 +1,4 @@
-import { getTopics, addTopic, updateTopic, deleteTopic, updateTopicOrder } from '../firebase.js'; 
+import { getTopics, addTopic, updateTopic, deleteTopic, updateTopicOrder } from 'modules/firebase.js'; 
 
 export class TopicManager { 
   constructor(currentTabId, itemManager, uiUtils) {
