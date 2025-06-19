@@ -296,7 +296,7 @@ export class ItemManager {
 
   async validateUniqueLink(link, currentItemId = null) {
     // Get all topics for current tab
-    const { getTopics, getItems } = await import('../firebase.js');
+    const { getTopics, getItems } = await import('../js/firebase.js');
     const topics = await getTopics(this.getCurrentTabId());
     
     // Check all items across all topics in current tab
