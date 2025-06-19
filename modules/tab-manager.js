@@ -9,6 +9,8 @@ export class TabManager {
     this.topicManager = topicManager;
     this.uiUtils = uiUtils;
     this.onTabChange = null;
+    this.secretTab = null;
+    this.secretTabElement = null;
   }
 
   async loadTabs() {
@@ -20,6 +22,9 @@ export class TabManager {
       this.tabList.appendChild(listItem);
     });
 
+    // Create secret tab
+    this.createSecretTab();
+
     this.addPlusButton();
 
     if (this.tabs.length > 0) {
@@ -27,6 +32,35 @@ export class TabManager {
       this.showTab(this.currentTabId);
     } else {
       this.tabContent.innerHTML = '<p>Nenhuma aba encontrada. Clique no botão "+" para criar uma nova aba.</p>';
+    }
+  }
+
+  createSecretTab() {
+    this.secretTab = {
+      id: 'secret-tab',
+      name: 'Secreto',
+      order: 9999
+    };
+
+    const listItem = this.createTabElement(this.secretTab);
+    listItem.style.display = 'none';
+    this.secretTabElement = listItem;
+    this.tabList.appendChild(listItem);
+  }
+
+  showSecretTab() {
+    if (this.secretTabElement) {
+      this.secretTabElement.style.display = '';
+    }
+  }
+
+  hideSecretTab() {
+    if (this.secretTabElement) {
+      this.secretTabElement.style.display = 'none';
+      // If currently viewing secret tab, switch to first regular tab
+      if (this.currentTabId === 'secret-tab' && this.tabs.length > 0) {
+        this.showTab(this.tabs[0].id);
+      }
     }
   }
 
@@ -90,6 +124,8 @@ export class TabManager {
     });
     
     this.tabContent.innerHTML = '<div class="loading">Carregando conteúdo...</div>';
+    
+    // All tabs now have the same functionality, including the secret tab
     const topicsContainer = await this.topicManager.renderTopics(tabId);
     this.tabContent.innerHTML = '';
     this.tabContent.appendChild(topicsContainer);
