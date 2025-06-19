@@ -1,5 +1,5 @@
 import { getTabs, addTab, updateTab, deleteTab, updateTabOrder } from '../js/firebase.js';
- 
+
 export class TabManager {
   constructor(tabs, currentTabId, tabList, tabContent, topicManager, uiUtils) {
     this.tabs = tabs;
