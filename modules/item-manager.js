@@ -16,22 +16,28 @@ export class ItemManager {
     itemList.classList.add('item-list');
     itemList.dataset.topicId = topicId;
 
-    getItems(this.getCurrentTabId(), topicId).then(items => {
-      items.forEach(item => {
-        const listItem = this.createItemElement(item);
-        itemList.appendChild(listItem);
-      });
-      Sortable.create(itemList, {
-        group: 'items',
-        animation: 150,
-        handle: '.drag-handle',
-        onEnd: async function(evt) {
-          await this.updateAllItemOrders();
-        }.bind(this)
-      });
-    });
+    // Load items immediately and populate the list
+    this.loadItemsForList(itemList, topicId);
 
     return itemList;
+  }
+
+  async loadItemsForList(itemList, topicId) {
+    const items = await getItems(this.getCurrentTabId(), topicId);
+    items.forEach(item => {
+      const listItem = this.createItemElement(item);
+      itemList.appendChild(listItem);
+    });
+    
+    // Initialize sortable after items are loaded
+    Sortable.create(itemList, {
+      group: 'items',
+      animation: 150,
+      handle: '.drag-handle',
+      onEnd: async function(evt) {
+        await this.updateAllItemOrders();
+      }.bind(this)
+    });
   }
 
   createItemElement(item) {
@@ -182,7 +188,8 @@ export class ItemManager {
     </svg>`;
 
     const tooltipText = document.createElement('div');
-    tooltipText.textContent = item.description || 'Sem descrição';
+    const description = item.description || 'Sem descrição';
+    tooltipText.innerHTML = description.replace(/\n/g, '<br>');
 
     tooltip.appendChild(closeButton);
     tooltip.appendChild(tooltipText);
@@ -223,7 +230,8 @@ export class ItemManager {
     explanationButton.textContent = '?';
     const tooltip = document.createElement('div');
     tooltip.classList.add('tooltip');
-    tooltip.innerHTML = `<div>${item.description || 'Sem descrição'}</div>`;
+    const description = item.description || 'Sem descrição';
+    tooltip.innerHTML = `<div>${description.replace(/\n/g, '<br>')}</div>`;
     explanationButton.appendChild(tooltip);
     return explanationButton;
   }
@@ -368,7 +376,11 @@ export class ItemManager {
         const mainLink = listItem.querySelector('a.item-link');
         mainLink.href = newLink;
         mainLink.textContent = this.uiUtils.extractDomain(newLink);
-        listItem.querySelector('.tooltip').textContent = newDescription || 'Sem descrição';
+        const tooltip = listItem.querySelector('.tooltip');
+        if (tooltip) {
+          const tooltipDiv = tooltip.querySelector('div') || tooltip;
+          tooltipDiv.innerHTML = newDescription ? newDescription.replace(/\n/g, '<br>') : 'Sem descrição';
+        }
         const fonteLink = listItem.querySelector('a.item-source');
         fonteLink.href = newFonte;
         fonteLink.textContent = newFonte ? this.uiUtils.extractDomain(newFonte) : '';
