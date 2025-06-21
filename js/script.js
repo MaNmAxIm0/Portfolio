@@ -1,5 +1,5 @@
 import {
-  initializeFirebase, 
+  initializeFirebase,
   getTabs,
   addTab,
   updateTab,
@@ -46,6 +46,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   itemManager.setCurrentTabIdGetter(() => currentTabId);
   topicManager.setCurrentTabIdGetter(() => currentTabId);
   
+  // Update current tab reference when it changes
+  tabManager.onTabChange = (newTabId) => {
+    currentTabId = newTabId;
+  };
+
   // Initialize search functionality
   searchManager.initialize();
   searchManager.setTabManager(tabManager);
