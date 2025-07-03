@@ -1,7 +1,7 @@
 import {
   initializeFirebase,
   getTabs,
-  addTab, 
+  addTab,
   updateTab,
   deleteTab,
   getItems,
