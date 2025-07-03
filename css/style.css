@@ -4,26 +4,22 @@ body {
   background-color: #ffffff;
   color: #333333;
 }
-
 .container {
   width: 90%;
   max-width: 1200px;
   margin: 30px auto;
   background-color: #fff;
 }
-
 .header-controls {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 20px;
 }
-
 .search-container {
   position: relative;
   display: flex;
   align-items: center;
 }
-
 #search-input {
   padding: 10px 35px 10px 15px;
   border: 1px solid #e0e0e0;
@@ -32,13 +28,11 @@ body {
   width: 250px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
 #search-input:focus {
   outline: none;
   border-color: #2196F3;
   box-shadow: 0 0 5px rgba(33, 150, 243, 0.3);
 }
-
 #clear-search {
   position: absolute;
   right: 10px;
@@ -53,23 +47,18 @@ body {
   border-radius: 50%;
   transition: background-color 0.2s ease;
 }
-
 #clear-search:hover {
   background-color: #f0f0f0;
 }
-
 header {
   text-align: center;
   padding-bottom: 20px;
   border-bottom: 1px solid #ddd;
   color: #333333;
 }
-
-/* Tab Navigation */
 #tab-navigation {
   margin-bottom: 30px;
 }
-
 #tab-navigation ul {
   list-style: none;
   padding: 0;
@@ -78,12 +67,9 @@ header {
   overflow-x: auto;
   gap: 10px;
 }
-
 #tab-navigation ul li {
   margin: 0;
 }
-
-/* Tab styling */
 .tab-container {
   display: inline-flex;
   align-items: center;
@@ -94,13 +80,11 @@ header {
   position: relative;
   transition: all 0.2s ease;
 }
-
 .tab-container.active {
   background-color: #2196F3;
   color: white;
   box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
 }
-
 .tab-button {
   background: none;
   border: none;
@@ -109,11 +93,9 @@ header {
   padding: 0;
   color: inherit;
 }
-
 .tab-button:focus {
   outline: none;
 }
-
 .tab-delete-button {
   background: transparent;
   border: none;
@@ -125,12 +107,9 @@ header {
   opacity: 0.7;
   transition: opacity 0.2s ease;
 }
-
 .tab-delete-button:hover {
   opacity: 1;
 }
-
-/* Plus Button Styling */
 #add-tab-button {
   background-color: #2196F3;
   color: white;
@@ -141,23 +120,18 @@ header {
   font-size: 16px;
   transition: background-color 0.2s ease;
 }
-
 #add-tab-button:hover {
   background-color: #1976D2;
 }
-
-/* Topic styles */
 #topics-container {
   margin-top: 30px;
 }
-
 .topic {
   margin-bottom: 15px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   overflow: hidden;
 }
-
 .topic-header {
   display: flex;
   justify-content: space-between;
@@ -168,25 +142,20 @@ header {
   transition: background-color 0.2s ease;
   color: #333333;
 }
-
 .topic-header:hover {
   background-color: #f1f3f4;
 }
-
-/* Topic Title Container (for mobile and desktop) */
 .topic-title-container {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
 .topic-name {
   font-weight: 500;
   font-size: 16px;
   color: #333333;
   cursor: default;
 }
-
 .topic-name-input {
   font-size: 16px;
   padding: 5px 10px;
@@ -194,15 +163,11 @@ header {
   border-radius: 4px;
   background-color: white;
 }
-
-/* Topic Controls */
 .topic-controls {
   display: flex;
   align-items: center;
   gap: 10px;
 }
-
-/* Topic Drag Handle */
 .topic-drag-handle {
   cursor: grab;
   display: inline-flex;
@@ -215,11 +180,9 @@ header {
   padding: 4px;
   transition: background-color 0.3s ease;
 }
-
 .topic-drag-handle:hover {
   background-color: #d5d5d5;
 }
-
 .topic-delete-button {
   background: none;
   border: none;
@@ -230,22 +193,17 @@ header {
   transition: opacity 0.2s ease;
   font-weight: bold;
 }
-
 .topic-delete-button:hover {
   opacity: 1;
 }
-
 .topic.collapsed .topic-content {
   display: none;
 }
-
-/* Item List */
 .item-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-
 .item-list li {
   position: relative;
   padding: 12px 16px;
@@ -256,24 +214,19 @@ header {
   color: #333333;
   min-height: 24px;
 }
-
 .item-list li:last-child {
   border-bottom: none;
 }
-
-/* Desktop Item Styles */
 .item-left .item-title {
   margin-right: 4px;  
   font-weight: 500;
   word-break: break-word; 
 }
-
 .item-link-container {
   display: flex;
   align-items: center;
   gap: 4px;  
 }
-
 .item-link {
   flex-grow: 1;
   min-width: 100px; 
@@ -283,12 +236,9 @@ header {
   word-break: break-all;
   margin-right: 2px;  
 }
-
 .item-link:hover {
   color: #0D47A1;
 }
-
-/* Fonte link: same as item-link but italic and gray */
 .fonte-container .item-source,
 .item-source {
   flex-grow: 1;
@@ -300,11 +250,9 @@ header {
   color: #555;
   margin-left: 4px;  
 }
-
 .item-source:hover {
   color: #555;
 }
-
 .item-description {
   cursor: pointer;
   color: #424242;
@@ -312,15 +260,11 @@ header {
   align-items: center;
   margin: 0 4px;  
 }
-
-/* Item details specific style */
 .item-details {
   display: flex;
   align-items: center;
   gap: 4px;
 }
-
-/* Desktop tooltip behavior */
 @media screen and (min-width: 769px) {
   .tooltip {
     position: absolute;
@@ -336,27 +280,19 @@ header {
     display: none;
     z-index: 1000;
   }
-
   .item-description {
     position: relative;
   }
-
-  /* Show tooltip on hover/click for desktop */
   .item-description .tooltip.visible {
     display: block;
   }
-
-  /* Hide close button on desktop, unless it's a sticky tooltip */
   .tooltip .tooltip-close {
     display: none;
   }
-
   .tooltip.sticky .tooltip-close {
       display: block;
   }
 }
-
-/* Mobile tooltip behavior (keeps existing click behavior) */
 @media screen and (max-width: 768px) {
   .tooltip {
     position: fixed;
@@ -373,26 +309,21 @@ header {
     display: none;
     z-index: 1001;
   }
-
   .tooltip.active {
     display: block;
   }
 }
-
-/* Item Options */
 .item-options {
   display: flex;
   gap: 10px;
   align-items: center;
 }
-
 .item-right-controls {
   margin-left: auto;
   display: flex;
   align-items: center;
   gap: 15px;
 }
-
 .drag-handle {
   cursor: grab;
   display: inline-flex;
@@ -406,11 +337,9 @@ header {
   transition: background-color 0.3s ease;
   margin-right: 8px;
 }
-
 .drag-handle:hover {
   background-color: #d5d5d5;
 }
-
 .edit-button {
   background-color: #f8f9fa;
   border: 1px solid #ccc;
@@ -421,11 +350,9 @@ header {
   font-size: 14px;
   color: #333;
 }
-
 .edit-button:hover {
   background-color: #e0e0e0;
 }
-
 .delete-button {
   background-color: #ff4d4f;
   border: none;
@@ -436,12 +363,9 @@ header {
   font-size: 14px;
   color: white;
 }
-
 .delete-button:hover {
   background-color: #ff7875;
 }
-
-/* Item Form */
 .item-form {
   margin-top: 20px;
   padding: 20px;
@@ -452,24 +376,20 @@ header {
   gap: 15px;
   position: relative;
 }
-
 .item-form .form-group {
   display: flex;
   flex-direction: column;
 }
-
 .item-form .form-group:last-of-type {
   flex-grow: 1;
   width: auto;
   margin-right: 50px;
 }
-
 .item-form label {
   margin-bottom: 8px;
   color: #424242;
   font-size: 14px;
 }
-
 .item-form input[type="text"] {
   width: 20ch;
   padding: 10px;
@@ -477,28 +397,23 @@ header {
   border-radius: 4px;
   transition: border-color 0.2s ease;
 }
-
 .item-form input[type="text"]:focus {
   border-color: #2196F3;
   outline: none;
 }
-
 .item-form textarea {
   width: calc(100% - 50px);
-  height: 38px;
+  height: 36px;
   resize: vertical;
   padding: 10px;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   transition: border-color 0.2s ease;
-  height: 36px;
 }
-
 .item-form textarea:focus {
   border-color: #2196F3;
   outline: none;
 }
-
 #save-item-button, .item-form button {
   background-color: #4CAF50;
   color: white;
@@ -517,11 +432,9 @@ header {
   right: 20px;
   bottom: 20px;
 }
-
 #save-item-button:hover, .item-form button:hover {
   background-color: #388E3C;
 }
-
 #add-topic-button {
   display: block;
   width: 100%;
@@ -535,32 +448,24 @@ header {
   color: #757575;
   transition: all 0.2s ease;
 }
-
 #add-topic-button:hover {
   background-color: #f1f3f4;
   border-color: #2196F3;
   color: #2196F3;
 }
-
 .sortable-ghost {
   opacity: 0.4;
 }
-
 .topic .item-form {
   margin: 10px 0 0 0;
   border-radius: 4px;
 }
-
-/* Loading Indicator */
 .loading {
   font-size: 1.5em;
   text-align: center;
   padding: 20px;
 }
-
-/* Mobile adjustments */
 @media only screen and (max-width: 768px) {
-  /* Adjustments for existing desktop elements */
   .item-list li {
     flex-direction: column;
     align-items: center;
@@ -579,8 +484,6 @@ header {
     margin: 0 auto 8px auto;
     display: block;
   }
-
-  /* New Mobile Item Layout */
   li.item {
     list-style: none;
     padding: 12px 16px;
@@ -636,142 +539,39 @@ header {
     white-space: nowrap;
     max-width: 60%;
   }
-
-  /* Ajuste de alinhamento para título e link */
   li.item .item-title {
-    margin-left: 15px;
+    margin-left: 8px; 
     text-align: left;
     width: auto;
     margin-right: 8px;
   }
-
-  li.item .item-link {
-    margin-left: 0;
-    max-width: calc(100% - 100px);
-  }
-
-  /* Ajuste no container principal */
-  li.item {
-    padding: 12px 5px 12px 15px;
-    align-items: flex-start;
-  }
-
-  /* Melhoria no espaçamento entre elementos */
-  .item-middle {
-    padding: 0 15px;
-    width: 100%;
-  }
-
-  /* Alinhamento dos controles */
-  .item-controls {
-    width: 100%;
-    justify-content: flex-end;
-    padding-right: 15px;
-    margin-top: 8px;
-  }
-
-  /* Ajuste dos controles móveis */
-  .item-controls {
-    order: 2;
-    justify-content: flex-start !important;
-    width: 100%;
-    padding-left: 15px;
-    gap: 12px;
-    margin: 8px 0;
-  }
-
-  .item-controls .drag-handle {
-    margin-right: 0;
-  }
-
-  .item-middle {
-    order: 3;
-    width: 100%;
-    padding-left: 15px;
-  }
-  li.item .item-middle {
-    padding: 0 15px;
-    width: calc(100% - 30px);
-    margin: 8px 0;
-  }
-  
-  .item-source {
-    max-width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-left: 8px;
-  }
-
-  .item-controls {
-    margin-left: auto;
-  }
-
-  .item-description {
-    order: 1;
-  }
-
-  .item-source {
-    order: 2;
-  }
-
-  .item-controls {
-    order: 3;
-  }
-}
-
-@media only screen and (max-width: 768px) {
-  /* Ajuste de margens */
-  li.item {
-    padding: 12px 5px 12px 5px; 
-  }
-
-  li.item .item-title {
-    margin-left: 8px; 
-  }
-
   li.item .item-middle {
     padding: 0 5px; 
   }
-
-  /* Aumenta margem direita nos controles */
   .item-controls {
     padding-right: 30px; 
     margin-left: 8px; 
   }
-
-  /* Alinhamento da fonte */
   .fonte-container {
     margin-left: 8px; 
     padding-left: 0;
   }
-
-  /* Ajuste de alinhamento geral */
   li.item .item-middle,
   li.item .item-controls {
     padding-left: 8px; 
   }
-
-  /* Remove margem extra da fonte */
   .item-source {
     margin-left: 0 !important;
     padding-left: 5px;
   }
-  
-  /* Ajuste final de posicionamento */
   li.item .item-middle {
     width: calc(100% - 10px); 
     margin: 8px 0;
   }
-}
-
-/* Mobile Tooltip Fix */
-@media only screen and (max-width: 768px) {
   .item-description {
     position: relative;
     z-index: 1;
   }
-
   .tooltip {
     display: none;
     position: fixed;
@@ -782,18 +582,15 @@ header {
     max-width: 300px;
     margin-left: 0;
   }
-
   .tooltip.active {
     display: block;
     z-index: 1001;
   }
-
   .item-description.active {
     color: #2196F3;
     font-weight: bold;
   }
 }
-
 .tooltip-close {
   position: absolute;
   top: 5px;
@@ -805,11 +602,9 @@ header {
   background: none;
   border: none;
 }
-
 .tooltip-close:hover {
   opacity: 1;
 }
-
 .tooltip-backdrop {
   position: fixed;
   top: 0;
@@ -820,11 +615,9 @@ header {
   display: none;
   z-index: 999;
 }
-
 .tooltip-backdrop.active {
   display: block;
 }
-
 .item-description.active {
   color: #2196F3;
   font-weight: bold;
