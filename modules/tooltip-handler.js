@@ -166,3 +166,4 @@ export class TooltipHandler {
     return closeButton;
   }
 }
+
