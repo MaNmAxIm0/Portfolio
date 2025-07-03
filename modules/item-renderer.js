@@ -20,7 +20,6 @@ export class ItemRenderer {
     li.style.padding = '12px 15px';
     li.style.gap = '8px';
 
-    // Linha 1: Título + Link + Explicação
     const titleLinkContainer = document.createElement('div');
     titleLinkContainer.style.display = 'flex';
     titleLinkContainer.style.gap = '8px';
@@ -40,13 +39,11 @@ export class ItemRenderer {
     mainLink.textContent = this.uiUtils.extractDomain(item.link);
     titleLinkContainer.appendChild(mainLink);
 
-    // Botão de explicação na mesma linha do link
     const questionSpan = this.tooltipHandler.createTooltip(item);
     titleLinkContainer.appendChild(questionSpan);
 
     li.appendChild(titleLinkContainer);
 
-    // Linha 2: Fonte + Controles
     const middleDiv = document.createElement('div');
     middleDiv.style.display = 'flex';
     middleDiv.style.justifyContent = 'space-between';
@@ -54,7 +51,6 @@ export class ItemRenderer {
     middleDiv.style.width = '100%';
     middleDiv.style.marginLeft = '15px';
 
-    // Container fonte
     const fonteContainer = document.createElement('div');
     fonteContainer.style.display = 'flex';
     fonteContainer.style.alignItems = 'center';
@@ -71,7 +67,6 @@ export class ItemRenderer {
 
     middleDiv.appendChild(fonteContainer);
 
-    // Controles
     const controlsDiv = this.createItemControls(item, li, itemManager);
     middleDiv.appendChild(controlsDiv);
     li.appendChild(middleDiv);
@@ -172,3 +167,4 @@ export class ItemRenderer {
     }
   }
 }
+
