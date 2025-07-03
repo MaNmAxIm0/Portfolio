@@ -29,7 +29,7 @@ export class TabManager {
 
     if (this.tabs.length > 0) {
       if (!this.currentTabId) this.currentTabId = this.tabs[0].id;
-      this.showTab(this.currentTabId);
+      await this.showTab(this.currentTabId);
     } else {
       this.tabContent.innerHTML = '<p>Nenhuma aba encontrada. Clique no botão "+" para criar uma nova aba.</p>';
     }
@@ -79,7 +79,7 @@ export class TabManager {
       if (tab.id === this.currentTabId) {
         this.enableTabNameEditing(tab, tabButton);
       } else {
-        this.showTab(tab.id);
+        await this.showTab(tab.id);
       }
     });
     tabContainer.appendChild(tabButton);
@@ -129,6 +129,8 @@ export class TabManager {
     const topicsContainer = await this.topicManager.renderTopics(tabId);
     this.tabContent.innerHTML = '';
     this.tabContent.appendChild(topicsContainer);
+
+    // No need for a setTimeout or returning a Promise, as topicManager.renderTopics now awaits all item loading.
   }
 
   enableTabNameEditing(tab, tabButton) {
@@ -158,7 +160,7 @@ export class TabManager {
         if (tab.id === this.currentTabId) {
           this.enableTabNameEditing(tab, newButton);
         } else {
-          this.showTab(tab.id);
+          await this.showTab(tab.id);
         }
       });
       container.replaceChild(newButton, input);
@@ -185,7 +187,7 @@ export class TabManager {
       if (this.currentTabId === tabId) {
         if (this.tabs.length > 0) {
           this.currentTabId = this.tabs[0].id;
-          this.showTab(this.currentTabId);
+          await this.showTab(this.currentTabId);
         } else {
           this.tabContent.innerHTML = '<p>Nenhuma aba encontrada. Clique no botão "+" para criar uma nova aba.</p>';
           this.currentTabId = null;
@@ -205,7 +207,7 @@ export class TabManager {
     const addTabLi = this.tabList.querySelector('li.no-drag');
     const listItem = this.createTabElement(newTab);
     this.tabList.insertBefore(listItem, addTabLi);
-    this.showTab(newTabId);
+    await this.showTab(newTabId);
     
     setTimeout(() => {
       const tabButton = listItem.querySelector('.tab-button');
