@@ -40,3 +40,4 @@ export class UIUtils {
     return topicDragHandle;
   }
 }
+
