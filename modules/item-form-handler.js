@@ -3,7 +3,7 @@ import { addItem, updateItem } from '../js/firebase.js';
 export class ItemFormHandler {
   constructor(getCurrentTabId) {
     this.getCurrentTabId = getCurrentTabId;
-    this.itemManager = null; // To be set for validation
+    this.itemManager = null;
   }
 
   setItemManager(itemManager) {
@@ -45,32 +45,25 @@ export class ItemFormHandler {
       const newDescription = editForm.querySelector(`#edit-item-description-${item.id}`).value.trim();
       
       if (newTitle && newLink) {
-        // Check for duplicate title (excluding current item)
         const isTitleUnique = await this.itemManager.validateUniqueTitle(newTitle, item.id);
         if (!isTitleUnique) {
           alert('Já existe um item com este título. Por favor, escolha um título diferente.');
           return;
         }
-        
-        // Check for duplicate link (excluding current item)
         const isLinkUnique = await this.itemManager.validateUniqueLink(newLink, item.id);
         if (!isLinkUnique) {
           alert('Já existe um item com este link. Por favor, use um link diferente.');
           return;
         }
-        
         await updateItem(this.getCurrentTabId(), item.id, item.topicId, newTitle, newLink, newFonte, newDescription);
-        
-        // Update the item object properties to reflect the changes
+
         item.title = newTitle;
         item.link = newLink;
         item.fonte = newFonte;
         item.description = newDescription;
-        
-        // Re-render the item to reflect changes
+
         const newItemElement = itemRenderer.createItemElement(item, this.itemManager);
         listItem.replaceWith(newItemElement);
-        
       } else {
         alert('Por favor, preencha o título e o link.');
       }
@@ -107,42 +100,36 @@ export class ItemFormHandler {
       const description = document.getElementById(`item-description-${topicId}`).value.trim() || '';
       
       if (title && link) {
-        // Check for duplicate title
         const isTitleUnique = await this.itemManager.validateUniqueTitle(title);
         if (!isTitleUnique) {
           alert('Já existe um item com este título. Por favor, escolha um título diferente.');
           return;
         }
-        
-        // Check for duplicate link
         const isLinkUnique = await this.itemManager.validateUniqueLink(link);
         if (!isLinkUnique) {
           alert('Já existe um item com este link. Por favor, use um link diferente.');
           return;
         }
-        
         const newItemId = await addItem(this.getCurrentTabId(), topicId, title, link, fonte, description);
-        
+
         document.getElementById(`item-title-${topicId}`).value = '';
         document.getElementById(`item-link-${topicId}`).value = '';
         document.getElementById(`item-fonte-${topicId}`).value = '';
         document.getElementById(`item-description-${topicId}`).value = '';
-        
+
         const topicElement = document.querySelector(`.topic[data-topic-id="${topicId}"]`);
         const itemList = topicElement.querySelector('.item-list');
         const newItem = { id: newItemId, title, link, fonte, description, topicId, order: itemList.children.length };
-        
-        // Need itemRenderer to create the new element
-        const { ItemRenderer } = await import('../modules/item-renderer.js');
-        const { UIUtils } = await import('../modules/ui-utils.js');
-        const { TooltipHandler } = await import('../modules/tooltip-handler.js');
+
+        const { ItemRenderer } = await import('./item-renderer.js');
+        const { UIUtils } = await import('./ui-utils.js');
+        const { TooltipHandler } = await import('./tooltip-handler.js');
         const uiUtils = new UIUtils();
         const tooltipHandler = new TooltipHandler(uiUtils);
         const itemRenderer = new ItemRenderer(uiUtils, tooltipHandler, this);
 
         const listItem = itemRenderer.createItemElement(newItem, this.itemManager);
         itemList.appendChild(listItem);
-
       } else {
         alert('Por favor, preencha o título e o link.');
       }
@@ -150,3 +137,4 @@ export class ItemFormHandler {
     return itemForm;
   }
 }
+
