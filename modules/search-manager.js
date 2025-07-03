@@ -22,12 +22,10 @@ export class SearchManager {
     searchInput.addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase().trim();
 
-      // Skip intermediate secret-code prefixes
       if (this.targetSequence.startsWith(term) && term.length < this.targetSequence.length) {
         return;
       }
 
-      // Secret code detection
       if (term === this.targetSequence) {
         if (!this.secretCodeActive) {
           this.secretCodeActive = true;
@@ -35,14 +33,21 @@ export class SearchManager {
           this.tabManager.showTab('secret-tab');
           this.secretTabShown = true;
         }
+        this.currentSearchTerm = '';
+        clearSearch.style.display = 'none';
         return;
       }
 
-      // Normal search: update term and show clear button
+      if (this.secretCodeActive) {
+        this.secretCodeActive = false;
+        if (this.secretTabShown) {
+          this.tabManager.hideSecretTab();
+          this.secretTabShown = false;
+        }
+      }
+
       this.currentSearchTerm = term;
       clearSearch.style.display = term ? 'block' : 'none';
-
-      // Debounce filter for performance
       clearTimeout(this.debounceTimer);
       this.debounceTimer = setTimeout(() => {
         this.filterContent();
@@ -72,13 +77,13 @@ export class SearchManager {
   }
 
   async filterContent() {
+    if (this.secretCodeActive) return;
+
     const searchTerm = this.currentSearchTerm;
     const tabContent = document.getElementById('tab-content');
-    // Clear no-results if present
     let noResultsMsg = document.getElementById('no-results-message');
 
     if (!searchTerm) {
-      // Show all topics and items
       if (noResultsMsg) noResultsMsg.remove();
       document.querySelectorAll('.topic').forEach(topic => {
         topic.style.display = '';
@@ -89,7 +94,6 @@ export class SearchManager {
       return;
     }
 
-    // Search across all tabs
     const allItems = await getAllItems();
     const matches = allItems.filter(item => {
       const term = searchTerm;
@@ -99,7 +103,6 @@ export class SearchManager {
              (item.fonte || '').toLowerCase().includes(term);
     });
 
-    // If matches found, switch to tab with most results
     if (matches.length > 0) {
       const counts = {};
       matches.forEach(item => {
@@ -111,7 +114,6 @@ export class SearchManager {
       await this.tabManager.showTab(targetTabId);
     }
 
-    // Now filter within the currently displayed tab
     let hasVisibleContent = false;
     document.querySelectorAll('.topic').forEach(topic => {
       let hasVisibleItems = false;
@@ -142,7 +144,6 @@ export class SearchManager {
       }
     });
 
-    // Show or remove no-results message
     noResultsMsg = document.getElementById('no-results-message');
     if (matches.length === 0) {
       if (!noResultsMsg) {
@@ -161,3 +162,4 @@ export class SearchManager {
     }
   }
 }
+
