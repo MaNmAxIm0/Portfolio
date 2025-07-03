@@ -17,17 +17,17 @@ export class TopicManager {
     const topicsContainer = document.createElement('div');
     topicsContainer.id = 'topics-container';
     
-    const itemLoadingPromises = []; // Collect promises here
+    const itemLoadingPromises = []; 
     
     topics.forEach(topic => {
       const { topicElement, itemLoadingPromise } = this.createTopicElement(topic);
       topicsContainer.appendChild(topicElement);
-      if (itemLoadingPromise) { // itemLoadingPromise can be null if an error occurred or not defined
+      if (itemLoadingPromise) { 
         itemLoadingPromises.push(itemLoadingPromise);
       }
     });
 
-    await Promise.all(itemLoadingPromises); // Wait for all items to be loaded across all topics
+    await Promise.all(itemLoadingPromises); 
 
     const addTopicButton = document.createElement('button');
     addTopicButton.id = 'add-topic-button';
@@ -100,13 +100,12 @@ export class TopicManager {
     topicContent.style.display = 'none';
     topicElement.classList.add('collapsed');
 
-    // Call itemManager.createItemList and get both the element and the promise
     const { itemList, loadingPromise: itemLoadingPromise } = this.itemManager.createItemList(topic.id);
     topicContent.appendChild(itemList);
     topicContent.appendChild(this.itemManager.renderItemForm(topic.id));
     topicElement.appendChild(topicContent);
 
-    return { topicElement, itemLoadingPromise }; // Return both the element and its item loading promise
+    return { topicElement, itemLoadingPromise }; 
   }
 
   async deleteCurrentTopic(topicId) {
@@ -164,10 +163,10 @@ export class TopicManager {
     const topicsContainer = document.getElementById('topics-container');
     if (topicsContainer) {
       const addTopicButton = document.getElementById('add-topic-button');
-      const { topicElement, itemLoadingPromise } = this.createTopicElement(newTopic); // Destructure here
+      const { topicElement, itemLoadingPromise } = this.createTopicElement(newTopic); 
       topicsContainer.insertBefore(topicElement, addTopicButton);
-      await itemLoadingPromise; // Wait for items to load for the new topic
-      const topicNameElement = newTopicElement.querySelector('.topic-name');
+      await itemLoadingPromise; 
+      const topicNameElement = topicElement.querySelector('.topic-name');
       setTimeout(() => {
         this.enableTopicNameEditing(newTopic, topicNameElement);
       }, 300);
