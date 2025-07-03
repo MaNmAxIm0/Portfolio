@@ -102,6 +102,18 @@ export async function updateItemOrder(itemId, topicId, order) {
   await update(itemRef, { topicId, order });
 }
 
+// New function: Get all items across all tabs
+export async function getAllItems() {
+  const itemsRef = ref(database, 'items');
+  const snapshot = await get(itemsRef);
+  if (snapshot.exists()) {
+    return Object.entries(snapshot.val())
+      .map(([id, data]) => ({ id, ...data }));
+  } else {
+    return [];
+  }
+}
+
 // Topics operations
 export async function getTopics(tabId) {
   const topicsRef = ref(database, 'topics');
