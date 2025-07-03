@@ -5,9 +5,7 @@ export class TooltipHandler {
   }
 
   initializeScrollListener() {
-    // Use capture to catch the event early.
     window.addEventListener('scroll', () => {
-      // Close active mobile tooltips
       const activeMobileTooltip = document.querySelector('.tooltip.active');
       if (activeMobileTooltip) {
         const backdrop = document.getElementById('tooltip-backdrop');
@@ -17,7 +15,6 @@ export class TooltipHandler {
         if (questionSpan) questionSpan.classList.remove('active');
       }
 
-      // Close sticky desktop tooltips
       const stickyDesktopTooltipButton = document.querySelector('.item-description.sticky');
       if (stickyDesktopTooltipButton) {
         const tooltip = stickyDesktopTooltipButton.querySelector('.tooltip');
@@ -53,7 +50,6 @@ export class TooltipHandler {
     tooltipText.innerHTML = description.replace(/\n/g, '<br>');
 
     tooltip.appendChild(tooltipText);
-    // Append to body to avoid being clipped by parent elements with overflow:hidden
     document.body.appendChild(tooltip);
 
     const closeTooltip = () => {
@@ -72,7 +68,6 @@ export class TooltipHandler {
     questionSpan.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      // Close any other open tooltips first
       document.querySelectorAll('.tooltip.active').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.item-description.active').forEach(d => d.classList.remove('active'));
       
@@ -120,7 +115,6 @@ export class TooltipHandler {
         }
     });
 
-    // Close on click outside for desktop sticky tooltips
     window.addEventListener('click', () => {
         if(explanationButton.classList.contains('sticky')) {
             unstick();
@@ -144,7 +138,6 @@ export class TooltipHandler {
         e.preventDefault();
         const isSticky = explanationButton.classList.contains('sticky');
         
-        // Hide any other sticky tooltips before showing a new one
         document.querySelectorAll('.item-description.sticky').forEach(btn => {
             if (btn !== explanationButton) {
                 btn.classList.remove('sticky');
