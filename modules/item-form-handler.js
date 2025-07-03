@@ -1,6 +1,6 @@
 import { addItem, updateItem } from '../js/firebase.js';
 
-export class ItemFormHandler {
+export class ItemFormHandler { 
   constructor(getCurrentTabId) {
     this.getCurrentTabId = getCurrentTabId;
     this.itemManager = null; // To be set for validation
