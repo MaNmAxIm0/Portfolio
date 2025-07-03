@@ -1,3 +1,5 @@
+import { getAllItems } from '../js/firebase.js';
+
 export class SearchManager {
   constructor() {
     this.currentSearchTerm = '';
@@ -5,6 +7,8 @@ export class SearchManager {
     this.secretSequence = '';
     this.targetSequence = 'bia';
     this.secretTabShown = false;
+    this.secretCodeActive = false;
+    this.debounceTimer = null;
   }
 
   setTabManager(tabManager) {
@@ -16,20 +20,45 @@ export class SearchManager {
     const clearSearch = document.getElementById('clear-search');
 
     searchInput.addEventListener('input', (e) => {
-      this.currentSearchTerm = e.target.value.toLowerCase().trim();
-      
-      // Check for secret sequence
-      this.checkSecretSequence(this.currentSearchTerm);
-      
-      this.filterContentAndSwitchTab();
-      clearSearch.style.display = this.currentSearchTerm ? 'block' : 'none';
+      const term = e.target.value.toLowerCase().trim();
+
+      // Skip intermediate secret-code prefixes
+      if (this.targetSequence.startsWith(term) && term.length < this.targetSequence.length) {
+        return;
+      }
+
+      // Secret code detection
+      if (term === this.targetSequence) {
+        if (!this.secretCodeActive) {
+          this.secretCodeActive = true;
+          this.tabManager.showSecretTab();
+          this.tabManager.showTab('secret-tab');
+          this.secretTabShown = true;
+        }
+        return;
+      }
+
+      // Normal search: update term and show clear button
+      this.currentSearchTerm = term;
+      clearSearch.style.display = term ? 'block' : 'none';
+
+      // Debounce filter for performance
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        this.filterContent();
+      }, 200);
     });
 
     clearSearch.addEventListener('click', () => {
       searchInput.value = '';
       this.currentSearchTerm = '';
+      this.secretCodeActive = false;
       this.filterContent();
       clearSearch.style.display = 'none';
+      if (this.secretTabShown) {
+        this.tabManager.hideSecretTab();
+        this.secretTabShown = false;
+      }
     });
   }
 
@@ -42,111 +71,69 @@ export class SearchManager {
     }
   }
 
-  async filterContentAndSwitchTab() {
-    if (!this.currentSearchTerm || !this.tabManager) {
-      this.filterContent();
+  async filterContent() {
+    const searchTerm = this.currentSearchTerm;
+    const tabContent = document.getElementById('tab-content');
+    // Clear no-results if present
+    let noResultsMsg = document.getElementById('no-results-message');
+
+    if (!searchTerm) {
+      // Show all topics and items
+      if (noResultsMsg) noResultsMsg.remove();
+      document.querySelectorAll('.topic').forEach(topic => {
+        topic.style.display = '';
+        topic.querySelectorAll('.item-list li').forEach(itemEl => {
+          itemEl.style.display = '';
+        });
+      });
       return;
     }
 
-    // Count matches in each tab
-    const tabCounts = await this.countMatchesInAllTabs();
-    
-    // Find tab with most matches
-    let bestTabId = null;
-    let maxCount = 0;
-    
-    for (const [tabId, count] of Object.entries(tabCounts)) {
-      if (count > maxCount) {
-        maxCount = count;
-        bestTabId = tabId;
-      }
+    // Search across all tabs
+    const allItems = await getAllItems();
+    const matches = allItems.filter(item => {
+      const term = searchTerm;
+      return (item.title || '').toLowerCase().includes(term) ||
+             (item.link || '').toLowerCase().includes(term) ||
+             (item.description || '').toLowerCase().includes(term) ||
+             (item.fonte || '').toLowerCase().includes(term);
+    });
+
+    // If matches found, switch to tab with most results
+    if (matches.length > 0) {
+      const counts = {};
+      matches.forEach(item => {
+        counts[item.tabId] = (counts[item.tabId] || 0) + 1;
+      });
+      const targetTabId = Object.keys(counts).reduce((a, b) =>
+        counts[a] >= counts[b] ? a : b
+      );
+      await this.tabManager.showTab(targetTabId);
     }
 
-    // Switch to best tab if it has matches and is different from current
-    if (bestTabId && maxCount > 0 && bestTabId !== this.tabManager.currentTabId) {
-      await this.tabManager.showTab(bestTabId);
-    }
-
-    // Filter content in current tab
-    this.filterContent();
-  }
-
-  async countMatchesInAllTabs() {
-    const tabs = this.tabManager.tabs;
-    const counts = {};
-    
-    for (const tab of tabs) {
-      counts[tab.id] = await this.countMatchesInTab(tab.id);
-    }
-    
-    return counts;
-  }
-
-  async countMatchesInTab(tabId) {
-    // Import getTopics and getItems dynamically to avoid circular imports
-    const { getTopics, getItems } = await import('../js/firebase.js');
-    
-    const topics = await getTopics(tabId);
-    let totalMatches = 0;
-    
-    for (const topic of topics) {
-      const items = await getItems(tabId, topic.id);
-      
-      for (const item of items) {
-        const title = (item.title || '').toLowerCase();
-        const link = (item.link || '').toLowerCase();
-        const description = (item.description || '').toLowerCase();
-        const fonte = (item.fonte || '').toLowerCase();
-        
-        if (title.includes(this.currentSearchTerm) || 
-            link.includes(this.currentSearchTerm) || 
-            description.includes(this.currentSearchTerm) ||
-            fonte.includes(this.currentSearchTerm)) {
-          totalMatches++;
-        }
-      }
-    }
-    
-    return totalMatches;
-  }
-
-  filterContent() {
-    const topics = document.querySelectorAll('.topic');
+    // Now filter within the currently displayed tab
     let hasVisibleContent = false;
-
-    topics.forEach(topic => {
-      const items = topic.querySelectorAll('.item-list li');
+    document.querySelectorAll('.topic').forEach(topic => {
       let hasVisibleItems = false;
-
-      items.forEach(item => {
-        const titleElement = item.querySelector('.item-title');
-        const linkElement = item.querySelector('.item-link');
-        const tooltipElement = item.querySelector('.tooltip div');
-        const sourceElement = item.querySelector('.item-source');
-        
-        const title = titleElement ? titleElement.textContent.toLowerCase() : '';
-        const link = linkElement ? linkElement.textContent.toLowerCase() : '';
-        const description = tooltipElement ? tooltipElement.textContent.toLowerCase() : '';
-        const fonte = sourceElement ? sourceElement.textContent.toLowerCase() : '';
-        
-        if (!this.currentSearchTerm || 
-            title.includes(this.currentSearchTerm) || 
-            link.includes(this.currentSearchTerm) ||
-            description.includes(this.currentSearchTerm) ||
-            fonte.includes(this.currentSearchTerm)) {
-          item.style.display = '';
+      topic.querySelectorAll('.item-list li').forEach(itemEl => {
+        const title    = itemEl.querySelector('.item-title')?.textContent.toLowerCase() || '';
+        const link     = itemEl.querySelector('.item-link')?.textContent.toLowerCase() || '';
+        const desc     = itemEl.querySelector('.tooltip div')?.textContent.toLowerCase() || '';
+        const fonte    = itemEl.querySelector('.item-source')?.textContent.toLowerCase() || '';
+        const visible = title.includes(searchTerm) ||
+                        link.includes(searchTerm) ||
+                        desc.includes(searchTerm) ||
+                        fonte.includes(searchTerm);
+        itemEl.style.display = visible ? '' : 'none';
+        if (visible) {
           hasVisibleItems = true;
           hasVisibleContent = true;
-        } else {
-          item.style.display = 'none';
         }
       });
-
-      if (!this.currentSearchTerm || hasVisibleItems) {
+      if (hasVisibleItems) {
         topic.style.display = '';
-        if (this.currentSearchTerm && hasVisibleItems) {
-          // Auto-expand topics with matching items
-          const content = topic.querySelector('.topic-content');
+        const content = topic.querySelector('.topic-content');
+        if (content) {
           content.style.display = 'block';
           topic.classList.remove('collapsed');
         }
@@ -155,18 +142,19 @@ export class SearchManager {
       }
     });
 
-    // Show message if no results found
-    const tabContent = document.getElementById('tab-content');
-    let noResultsMsg = document.getElementById('no-results-message');
-    if (this.currentSearchTerm && !hasVisibleContent) {
+    // Show or remove no-results message
+    noResultsMsg = document.getElementById('no-results-message');
+    if (matches.length === 0) {
       if (!noResultsMsg) {
-        noResultsMsg = document.createElement('div');
-        noResultsMsg.id = 'no-results-message';
-        noResultsMsg.textContent = 'Nenhum resultado encontrado.';
-        noResultsMsg.style.textAlign = 'center';
-        noResultsMsg.style.padding = '20px';
-        noResultsMsg.style.color = '#666';
-        tabContent.appendChild(noResultsMsg);
+        const msg = document.createElement('div');
+        msg.id = 'no-results-message';
+        msg.textContent = 'Nenhum resultado encontrado.';
+        Object.assign(msg.style, {
+          textAlign: 'center',
+          padding: '20px',
+          color: '#666'
+        });
+        tabContent.appendChild(msg);
       }
     } else if (noResultsMsg) {
       noResultsMsg.remove();
