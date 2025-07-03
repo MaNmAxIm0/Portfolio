@@ -22,12 +22,16 @@ export class TabManager {
       this.tabList.appendChild(listItem);
     });
 
-    this.createSecretTab();
+    this.createSecretTab(); // Always create the secret tab element, initially hidden.
 
     this.addPlusButton();
 
     if (this.tabs.length > 0) {
-      if (!this.currentTabId) this.currentTabId = this.tabs[0].id;
+      // If no tab is currently active (e.g., first load) or the last active tab was the secret one 
+      // (which isn't persisted as the default tab), then default to the first regular tab.
+      if (!this.currentTabId || this.currentTabId === 'secret-tab') { 
+          this.currentTabId = this.tabs[0].id;
+      }
       await this.showTab(this.currentTabId);
     } else {
       this.tabContent.innerHTML = '<p>Nenhuma aba encontrada. Clique no botão "+" para criar uma nova aba.</p>';
@@ -43,27 +47,21 @@ export class TabManager {
     this.secretTab = {
       id: 'secret-tab',
       name: 'Secreto',
-      order: 9999
+      order: 9999 // This order keeps it visually at the end of the tabs if it becomes visible
     };
 
     const listItem = this.createTabElement(this.secretTab);
-    listItem.style.display = 'none';
+    listItem.style.display = 'none'; // Initially hidden
+    listItem.classList.add('no-drag'); // Prevent dragging of the secret tab
     this.secretTabElement = listItem;
     this.tabList.appendChild(listItem);
   }
 
   showSecretTab() {
+    // This method is called by SearchManager when the secret code is entered.
+    // It makes the secret tab permanently visible in the list of tabs.
     if (this.secretTabElement) {
-      this.secretTabElement.style.display = '';
-    }
-  }
-
-  hideSecretTab() {
-    if (this.secretTabElement) {
-      this.secretTabElement.style.display = 'none';
-      if (this.currentTabId === 'secret-tab' && this.tabs.length > 0) {
-        this.showTab(this.tabs[0].id);
-      }
+      this.secretTabElement.style.display = ''; // Make it visible
     }
   }
 
