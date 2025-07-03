@@ -15,16 +15,16 @@ import {
   deleteTopic,
   updateTopicOrder,
   updateItemOrder
-} from './firebase.js';
+} from '../js/firebase.js';
 
-import { TabManager } from './modules/tab-manager.js';
-import { TopicManager } from './modules/topic-manager.js';
-import { ItemManager } from './modules/item-manager.js';
-import { ItemRenderer } from './modules/item-renderer.js';
-import { ItemFormHandler } from './modules/item-form-handler.js';
-import { TooltipHandler } from './modules/tooltip-handler.js';
-import { SearchManager } from './modules/search-manager.js';
-import { UIUtils } from './modules/ui-utils.js';
+import { TabManager } from '../modules/tab-manager.js';
+import { TopicManager } from '../modules/topic-manager.js';
+import { ItemManager } from '../modules/item-manager.js';
+import { ItemRenderer } from '../modules/item-renderer.js';
+import { ItemFormHandler } from '../modules/item-form-handler.js';
+import { TooltipHandler } from '../modules/tooltip-handler.js';
+import { SearchManager } from '../modules/search-manager.js';
+import { UIUtils } from '../modules/ui-utils.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Initialize Firebase
