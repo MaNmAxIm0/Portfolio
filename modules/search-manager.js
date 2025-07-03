@@ -4,11 +4,9 @@ export class SearchManager {
   constructor() {
     this.currentSearchTerm = '';
     this.tabManager = null;
-    this.secretSequence = '';
-    this.targetSequence = 'bia';
-    this.secretTabShown = false;
-    this.secretCodeActive = false;
+    this.secretSequence = 'bia';
     this.debounceTimer = null;
+    this._hasSecretCodeBeenActivated = false; 
   }
 
   setTabManager(tabManager) {
@@ -22,30 +20,29 @@ export class SearchManager {
     searchInput.addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase().trim();
 
-      if (this.targetSequence.startsWith(term) && term.length < this.targetSequence.length) {
+      
+      if (this.secretSequence.startsWith(term) && term.length < this.secretSequence.length) {
+        clearTimeout(this.debounceTimer);
+        this.currentSearchTerm = term;
+        clearSearch.style.display = term ? 'block' : 'none';
         return;
       }
 
-      if (term === this.targetSequence) {
-        if (!this.secretCodeActive) {
-          this.secretCodeActive = true;
-          this.tabManager.showSecretTab();
-          this.tabManager.showTab('secret-tab');
-          this.secretTabShown = true;
+      
+      if (term === this.secretSequence) {
+        if (!this._hasSecretCodeBeenActivated) {
+            this._hasSecretCodeBeenActivated = true; 
+            this.tabManager.showSecretTab(); 
         }
-        this.currentSearchTerm = '';
-        clearSearch.style.display = 'none';
-        return;
+        this.tabManager.showTab('secret-tab'); 
+        
+        
+        this.currentSearchTerm = term; 
+        clearSearch.style.display = 'block'; 
+        return; 
       }
 
-      if (this.secretCodeActive) {
-        this.secretCodeActive = false;
-        if (this.secretTabShown) {
-          this.tabManager.hideSecretTab();
-          this.secretTabShown = false;
-        }
-      }
-
+      
       this.currentSearchTerm = term;
       clearSearch.style.display = term ? 'block' : 'none';
       clearTimeout(this.debounceTimer);
@@ -57,34 +54,20 @@ export class SearchManager {
     clearSearch.addEventListener('click', () => {
       searchInput.value = '';
       this.currentSearchTerm = '';
-      this.secretCodeActive = false;
-      this.filterContent();
+      
+      this.filterContent(); 
       clearSearch.style.display = 'none';
-      if (this.secretTabShown) {
-        this.tabManager.hideSecretTab();
-        this.secretTabShown = false;
-      }
     });
   }
 
-  checkSecretSequence(searchTerm) {
-    if (searchTerm === this.targetSequence) {
-      if (this.tabManager) {
-        this.tabManager.showSecretTab();
-        this.secretTabShown = true;
-      }
-    }
-  }
-
   async filterContent() {
-    if (this.secretCodeActive) return;
-
     const searchTerm = this.currentSearchTerm;
     const tabContent = document.getElementById('tab-content');
     let noResultsMsg = document.getElementById('no-results-message');
 
     if (!searchTerm) {
       if (noResultsMsg) noResultsMsg.remove();
+      
       document.querySelectorAll('.topic').forEach(topic => {
         topic.style.display = '';
         topic.querySelectorAll('.item-list li').forEach(itemEl => {
@@ -94,49 +77,58 @@ export class SearchManager {
       return;
     }
 
-    const allItems = await getAllItems();
-    const matches = allItems.filter(item => {
+    
+    const allItems = await getAllItems(); 
+    
+    
+    const filteredItemIds = new Set(allItems.filter(item => {
       const term = searchTerm;
       return (item.title || '').toLowerCase().includes(term) ||
              (item.link || '').toLowerCase().includes(term) ||
              (item.description || '').toLowerCase().includes(term) ||
              (item.fonte || '').toLowerCase().includes(term);
-    });
+    }).map(item => item.id));
 
-    if (matches.length > 0) {
+    
+    if (filteredItemIds.size > 0) {
       const counts = {};
-      matches.forEach(item => {
-        counts[item.tabId] = (counts[item.tabId] || 0) + 1;
+      allItems.forEach(item => { 
+        if (filteredItemIds.has(item.id)) { 
+          counts[item.tabId] = (counts[item.tabId] || 0) + 1;
+        }
       });
+
       const targetTabId = Object.keys(counts).reduce((a, b) =>
         counts[a] >= counts[b] ? a : b
       );
-      await this.tabManager.showTab(targetTabId);
+      if (this.tabManager.currentTabId !== targetTabId) {
+        await this.tabManager.showTab(targetTabId);
+      }
     }
 
-    let hasVisibleContent = false;
+    noResultsMsg = document.getElementById('no-results-message');
+    let hasContentOnCurrentTab = false; 
+
+    
     document.querySelectorAll('.topic').forEach(topic => {
-      let hasVisibleItems = false;
+      let hasVisibleItemsInTopic = false;
       topic.querySelectorAll('.item-list li').forEach(itemEl => {
-        const title    = itemEl.querySelector('.item-title')?.textContent.toLowerCase() || '';
-        const link     = itemEl.querySelector('.item-link')?.textContent.toLowerCase() || '';
-        const desc     = itemEl.querySelector('.tooltip div')?.textContent.toLowerCase() || '';
-        const fonte    = itemEl.querySelector('.item-source')?.textContent.toLowerCase() || '';
-        const visible = title.includes(searchTerm) ||
-                        link.includes(searchTerm) ||
-                        desc.includes(searchTerm) ||
-                        fonte.includes(searchTerm);
+        const itemId = itemEl.dataset.itemId;
+        const visible = filteredItemIds.has(itemId); 
+        
         itemEl.style.display = visible ? '' : 'none';
         if (visible) {
-          hasVisibleItems = true;
-          hasVisibleContent = true;
+          hasVisibleItemsInTopic = true;
+          hasContentOnCurrentTab = true; 
         }
       });
-      if (hasVisibleItems) {
-        topic.style.display = '';
-        const content = topic.querySelector('.topic-content');
+
+      
+      if (hasVisibleItemsInTopic) {
+        topic.style.display = 'block';
+        const content = topic.querySelector('.topic-content'); 
         if (content) {
-          content.style.display = 'block';
+          content.style.display = 'block'; 
           topic.classList.remove('collapsed');
         }
       } else {
@@ -144,8 +136,8 @@ export class SearchManager {
       }
     });
 
-    noResultsMsg = document.getElementById('no-results-message');
-    if (matches.length === 0) {
+    
+    if (!hasContentOnCurrentTab) {
       if (!noResultsMsg) {
         const msg = document.createElement('div');
         msg.id = 'no-results-message';
