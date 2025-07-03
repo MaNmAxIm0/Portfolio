@@ -22,7 +22,6 @@ export class TabManager {
       this.tabList.appendChild(listItem);
     });
 
-    // Create secret tab
     this.createSecretTab();
 
     this.addPlusButton();
@@ -36,6 +35,11 @@ export class TabManager {
   }
 
   createSecretTab() {
+    const existingSecretTabElement = document.querySelector('li[data-tab-id="secret-tab"]');
+    if (existingSecretTabElement) {
+      existingSecretTabElement.remove();
+    }
+
     this.secretTab = {
       id: 'secret-tab',
       name: 'Secreto',
@@ -57,7 +61,6 @@ export class TabManager {
   hideSecretTab() {
     if (this.secretTabElement) {
       this.secretTabElement.style.display = 'none';
-      // If currently viewing secret tab, switch to first regular tab
       if (this.currentTabId === 'secret-tab' && this.tabs.length > 0) {
         this.showTab(this.tabs[0].id);
       }
@@ -113,7 +116,6 @@ export class TabManager {
   async showTab(tabId) {
     this.currentTabId = tabId;
     if (this.onTabChange) this.onTabChange(tabId);
-    
     this.tabList.querySelectorAll('li[data-tab-id]').forEach(li => {
       const container = li.querySelector('.tab-container');
       if (li.dataset.tabId === tabId) {
@@ -122,15 +124,10 @@ export class TabManager {
         container.classList.remove('active');
       }
     });
-    
     this.tabContent.innerHTML = '<div class="loading">Carregando conteúdo...</div>';
-    
-    // All tabs now have the same functionality, including the secret tab
     const topicsContainer = await this.topicManager.renderTopics(tabId);
     this.tabContent.innerHTML = '';
     this.tabContent.appendChild(topicsContainer);
-
-    // No need for a setTimeout or returning a Promise, as topicManager.renderTopics now awaits all item loading.
   }
 
   enableTabNameEditing(tab, tabButton) {
@@ -203,12 +200,10 @@ export class TabManager {
     const newTab = { id: newTabId, name: defaultName, order: newOrder };
     this.tabs.push(newTab);
     this.currentTabId = newTabId;
-    
     const addTabLi = this.tabList.querySelector('li.no-drag');
     const listItem = this.createTabElement(newTab);
     this.tabList.insertBefore(listItem, addTabLi);
     await this.showTab(newTabId);
-    
     setTimeout(() => {
       const tabButton = listItem.querySelector('.tab-button');
       this.enableTabNameEditing(newTab, tabButton);
