@@ -1,7 +1,7 @@
 export class UIUtils {
   // Helper: Extract domain from a URL and remove "www." if present.
   extractDomain(url) {
-    try { 
+    try {
       return new URL(url).hostname.replace(/^www\./, '');
     } catch (error) {
       return url.replace(/^www\./, '');
