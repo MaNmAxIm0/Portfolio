@@ -35,17 +35,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   let topicSortable;
   const uiUtils = new UIUtils();
   const tooltipHandler = new TooltipHandler(uiUtils);
-  const itemFormHandler = new ItemFormHandler(() => currentTabId);
+  const itemFormHandler = new ItemFormHandler(() => currentTabId, uiUtils);
   const itemRenderer = new ItemRenderer(uiUtils, tooltipHandler, itemFormHandler);
   const itemManager = new ItemManager(() => currentTabId, itemRenderer, itemFormHandler);
   const topicManager = new TopicManager(currentTabId, itemManager, uiUtils);
   const tabManager = new TabManager(tabs, currentTabId, tabList, tabContent, topicManager, uiUtils);
   const searchManager = new SearchManager();
+
   itemFormHandler.setItemManager(itemManager);
   topicManager.setCurrentTabIdGetter(() => currentTabId);
   searchManager.setTabManager(tabManager);
   searchManager.initialize();
+
+  tabManager.onTabChange = (newTabId) => {
+    currentTabId = newTabId;
+  };
+
   await tabManager.loadTabs();
+
   const isMobileScreen = window.innerWidth <= 768;
   sortable = Sortable.create(tabList, {
     filter: '.no-drag',
@@ -55,8 +62,4 @@ document.addEventListener('DOMContentLoaded', async () => {
       await tabManager.updateTabOrder();
     }
   });
-  tabManager.onTabChange = (newTabId) => {
-    currentTabId = newTabId;
-  };
 });
-
