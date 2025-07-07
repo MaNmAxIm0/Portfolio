@@ -622,3 +622,15 @@ header {
   color: #2196F3;
   font-weight: bold;
 }
+
+.input-error-message {
+  color: #ff4d4f;
+  font-size: 0.85em;
+  margin-top: 4px;
+  display: block;
+}
+
+.item-form input.input-error,
+.item-form textarea.input-error {
+  border-color: #ff4d4f;
+}
