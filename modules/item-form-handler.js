@@ -40,7 +40,7 @@ export class ItemFormHandler {
     }
 
     const editForm = document.createElement('div');
-    editForm.classList.add('item-form');
+    editForm.classList.add('item-form', 'edit-form');
     editForm.innerHTML = `
       <div class="form-group">
         <label for="edit-item-title-${item.id}">Título:</label>
