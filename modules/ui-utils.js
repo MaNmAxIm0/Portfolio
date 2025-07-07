@@ -39,5 +39,24 @@ export class UIUtils {
     topicDragHandle.addEventListener('click', (e) => { e.stopPropagation(); });
     return topicDragHandle;
   }
-}
 
+  showInputError(inputElement, message) {
+    this.clearInputError(inputElement);
+
+    const errorDiv = document.createElement('div');
+    errorDiv.classList.add('input-error-message');
+    errorDiv.textContent = message;
+    errorDiv.dataset.forInput = inputElement.id;
+
+    inputElement.classList.add('input-error');
+    inputElement.parentNode.insertBefore(errorDiv, inputElement.nextSibling);
+  }
+
+  clearInputError(inputElement) {
+    const errorDiv = inputElement.parentNode.querySelector(`.input-error-message[data-for-input="${inputElement.id}"]`);
+    if (errorDiv) {
+      errorDiv.remove();
+    }
+    inputElement.classList.remove('input-error');
+  }
+}
