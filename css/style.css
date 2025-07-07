@@ -414,6 +414,10 @@ header {
   border-color: #2196F3;
   outline: none;
 }
+.item-form.edit-form {
+  width: 100%;
+  margin-top: 10px;
+}
 #save-item-button, .item-form button {
   background-color: #4CAF50;
   color: white;
