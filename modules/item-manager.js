@@ -1,4 +1,4 @@
-import { getItems, deleteItem, updateItemOrder } from '../js/firebase.js';
+import { getItems, deleteItem, updateItemOrder, getAllItems } from '../js/firebase.js';
 
 export class ItemManager {
   constructor(getCurrentTabId, itemRenderer, itemFormHandler) {
@@ -42,30 +42,22 @@ export class ItemManager {
   }
 
   async validateUniqueTitle(title, currentItemId = null) {
-    const { getTopics, getItems } = await import('../js/firebase.js');
-    const topics = await getTopics(this.getCurrentTabId());
-    for (const topic of topics) {
-      const items = await getItems(this.getCurrentTabId(), topic.id);
-      for (const item of items) {
-        if (currentItemId && item.id === currentItemId) continue;
-        if (item.title.toLowerCase().trim() === title.toLowerCase().trim()) {
-          return false;
-        }
+    const allItems = await getAllItems();
+    for (const item of allItems) {
+      if (currentItemId && item.id === currentItemId) continue;
+      if (item.title.toLowerCase().trim() === title.toLowerCase().trim()) {
+        return false;
       }
     }
     return true;
   }
 
   async validateUniqueLink(link, currentItemId = null) {
-    const { getTopics, getItems } = await import('../js/firebase.js');
-    const topics = await getTopics(this.getCurrentTabId());
-    for (const topic of topics) {
-      const items = await getItems(this.getCurrentTabId(), topic.id);
-      for (const item of items) {
-        if (currentItemId && item.id === currentItemId) continue;
-        if (item.link.toLowerCase().trim() === link.toLowerCase().trim()) {
-          return false;
-        }
+    const allItems = await getAllItems();
+    for (const item of allItems) {
+      if (currentItemId && item.id === currentItemId) continue;
+      if (item.link.toLowerCase().trim() === link.toLowerCase().trim()) {
+        return false;
       }
     }
     return true;
